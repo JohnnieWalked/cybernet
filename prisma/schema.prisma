@@ -14,6 +14,7 @@ model User {
   id        Int      @id @default(autoincrement())
   email     String   @unique
   username  String   @unique
+  name      String   @default("<blank>")
   password  String
   createdAt DateTime @default(now())
   updateUt  DateTime @updatedAt
