@@ -17,9 +17,10 @@ export default function LoginForm() {
     errors: {},
   });
 
+  /* change form type after registration */
   useEffect(() => {
-    setFormType('login');
-  }, [formSignUpState.success]);
+    if (formSignUpState.success) setFormType('login');
+  }, [formSignUpState]);
 
   /* login form */
   const renderedLoginForm = (
@@ -102,8 +103,11 @@ export default function LoginForm() {
           CyberNet
         </h1>
       </div>
+
       {formType === 'login' ? renderedLoginForm : renderedSignUpForm}
-      {formSignUpState?.success && (
+
+      {/* popover message */}
+      {formSignUpState.success && (
         <ScreenPopover currrentState={formSignUpState.success}>
           Successful registration!
         </ScreenPopover>
