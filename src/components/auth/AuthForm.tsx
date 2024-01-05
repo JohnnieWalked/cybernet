@@ -1,52 +1,54 @@
 'use client';
 
 import { useFormState } from 'react-dom';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
+import { SwitchTransition, CSSTransition } from 'react-transition-group';
+import { toast } from 'react-toastify';
 
 /* server actions */
 import * as actions from '@/actions';
 
 /* components */
-import FormButtonPrimary from '../common/FormButtonPrimary';
+import FormButtonPrimary from './FormButtonPrimary';
 import Input from '../common/Input';
-import ScreenPopover from '../common/ScreenPopover';
 
-export default function LoginForm() {
-  const [formType, setFormType] = useState<'login' | 'signup'>('login');
+export default function AuthForm() {
+  const [formType, setFormType] = useState<'signin' | 'signup'>('signin');
+  const formRef = useRef<HTMLDivElement | null>(null);
   const [formSignUpState, signUpAction] = useFormState(actions.signUp, {
     errors: {},
   });
 
   /* change form type after registration */
   useEffect(() => {
-    if (formSignUpState.success) setFormType('login');
+    if (formSignUpState.success) {
+      setFormType('signin');
+      toast.success('Successful registration!');
+    }
   }, [formSignUpState]);
 
-  /* login form */
-  const renderedLoginForm = (
+  /* signin form */
+  const renderedSignInForm = (
     <>
       <form className="flex flex-col" action="">
-        <Input type="text" name="login" label="Username or email" />
+        <Input type="text" name="signin" label="Username or email" />
         <Input type="password" name="password" label="Password" />
-        <FormButtonPrimary>Login</FormButtonPrimary>
+        <FormButtonPrimary>Sign in</FormButtonPrimary>
       </form>
-      <div className="mt-8 text-center">Not a member?</div>
-      <div className=" flex mt-2 justify-between items-center text-lg">
-        <span className="w-[30%] h-[1px] bg-slate-400"></span>
+      <div className="flex mt-10 justify-center items-center text-lg">
         <button
           onClick={() => setFormType('signup')}
-          className="cursor-pointer underline hover:text-cyan-300 font-bold transition-colors"
+          className="cursor-pointer hover:underline hover:underline-offset-4 font-light"
         >
-          Sign up
+          Don&rsquo;t have an account?
         </button>
-        <span className="w-[30%] h-[1px] bg-slate-400"></span>
       </div>
     </>
   );
 
-  /* sign up form */
+  /* signup form */
   const renderedSignUpForm = (
-    <div>
+    <>
       <form className="flex flex-col" action={signUpAction}>
         <Input
           errors={formSignUpState?.errors.name}
@@ -80,17 +82,15 @@ export default function LoginForm() {
         />
         <FormButtonPrimary>Sign Up</FormButtonPrimary>
       </form>
-      <div className=" flex mt-10 justify-between items-center text-lg">
-        <span className="w-[30%] h-[1px] bg-slate-400"></span>
+      <div className="flex mt-10 justify-center items-center text-lg">
         <button
-          onClick={() => setFormType('login')}
-          className="cursor-pointer underline hover:text-cyan-300 transition-colors font-bold"
+          onClick={() => setFormType('signin')}
+          className="cursor-pointer font-light hover:underline hover:underline-offset-4"
         >
-          Login
+          Already have an account?
         </button>
-        <span className="w-[30%] h-[1px] bg-slate-400"></span>
       </div>
-    </div>
+    </>
   );
 
   return (
@@ -104,14 +104,20 @@ export default function LoginForm() {
         </h1>
       </div>
 
-      {formType === 'login' ? renderedLoginForm : renderedSignUpForm}
-
-      {/* popover message */}
-      {formSignUpState.success && (
-        <ScreenPopover currrentState={formSignUpState.success}>
-          Successful registration!
-        </ScreenPopover>
-      )}
+      <SwitchTransition mode="out-in">
+        <CSSTransition
+          key={formType}
+          addEndListener={(done) => {
+            formRef.current?.addEventListener('transitionend', done, false);
+          }}
+          nodeRef={formRef}
+          classNames="fade"
+        >
+          <div ref={formRef}>
+            {formType === 'signin' ? renderedSignInForm : renderedSignUpForm}
+          </div>
+        </CSSTransition>
+      </SwitchTransition>
     </div>
   );
 }

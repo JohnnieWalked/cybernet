@@ -1,6 +1,6 @@
 import homeLogo from '/public/imgs/cyberpunk-logo.png';
 import Image from 'next/image';
-import LoginForm from '@/components/loginForm/LoginForm';
+import AuthForm from '@/components/auth/AuthForm';
 
 export default function HomePage() {
   return (
@@ -14,7 +14,7 @@ export default function HomePage() {
         />
       </div>
       <div className="bg-zinc-800 box-shadow-left flex items-center justify-center w-full">
-        <LoginForm />
+        <AuthForm />
       </div>
     </div>
   );

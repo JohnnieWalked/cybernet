@@ -1,7 +1,8 @@
 @import './helpers';
 @import './cyberpunkButton';
 @import './animation';
+@import './react-transition-group';
 
 * {
-  font-family: 'Roboto';
+  box-sizing: border-box;
 }
