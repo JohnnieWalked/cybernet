@@ -18,6 +18,9 @@ export default function AuthForm() {
   const [formSignUpState, signUpAction] = useFormState(actions.signUp, {
     errors: {},
   });
+  const [formSignInState, signInAction] = useFormState(actions.login, {
+    errors: {},
+  });
 
   /* change form type after registration */
   useEffect(() => {
@@ -30,10 +33,16 @@ export default function AuthForm() {
   /* signin form */
   const renderedSignInForm = (
     <>
-      <form className="flex flex-col" action="">
+      <form className="flex flex-col" action={signInAction}>
         <Input type="text" name="signin" label="Username or email" />
         <Input type="password" name="password" label="Password" />
         <FormButtonPrimary>Sign in</FormButtonPrimary>
+
+        {formSignInState.errors._form ? (
+          <div className=" bg-red-900 border rounded border-red-500 mt-2 p-2 text-red-300">
+            {formSignInState.errors._form.join(', ')}
+          </div>
+        ) : null}
       </form>
       <div className="flex mt-10 justify-center items-center text-lg">
         <button
@@ -81,6 +90,12 @@ export default function AuthForm() {
           label="Repeat Password"
         />
         <FormButtonPrimary>Sign Up</FormButtonPrimary>
+
+        {formSignUpState.errors._form ? (
+          <div className=" bg-red-900 border rounded border-red-500 mt-2 p-2 text-red-300">
+            {formSignUpState.errors._form.join(', ')}
+          </div>
+        ) : null}
       </form>
       <div className="flex mt-10 justify-center items-center text-lg">
         <button

@@ -1,3 +1,7 @@
-export default function UserLayout() {
-  return <div>UserLayout</div>;
+export default function UserLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return <>{children}</>;
 }

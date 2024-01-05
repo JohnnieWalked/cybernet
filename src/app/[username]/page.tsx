@@ -1,3 +1,6 @@
-export default function UserHomePage() {
-  return <div>UserHomePage</div>;
+import { auth } from '@/auth';
+
+export default async function UserHomePage() {
+  const session = await auth();
+  return <div>{JSON.stringify(session)}</div>;
 }

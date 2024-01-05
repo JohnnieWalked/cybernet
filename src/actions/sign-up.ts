@@ -1,10 +1,11 @@
 'use server';
 
 import { db } from '@/db';
-import { hash } from 'bcrypt';
-import { signUpSchema } from '@/schemas';
+import bcryptjs from 'bcryptjs';
+import { SignUpSchema } from '@/schemas';
+import { getUserByEmail, getUserByUsername } from '@/data/user';
 
-type signUpProps = {
+type SignUpProps = {
   success?: boolean;
   errors: {
     name?: string[];
@@ -16,10 +17,10 @@ type signUpProps = {
 };
 
 export async function signUp(
-  formState: signUpProps,
+  formState: SignUpProps,
   formData: FormData
-): Promise<signUpProps> {
-  const result = signUpSchema.safeParse({
+): Promise<SignUpProps> {
+  const result = SignUpSchema.safeParse({
     name: formData.get('name'),
     username: formData.get('username'),
     email: formData.get('email'),
@@ -36,11 +37,9 @@ export async function signUp(
 
   try {
     // check if username already exists
-    const existingUserByUsername = await db.user.findUnique({
-      where: {
-        username: result.data.username,
-      },
-    });
+    const existingUserByUsername = await getUserByUsername(
+      result.data.username
+    );
     if (existingUserByUsername) {
       return {
         errors: {
@@ -50,11 +49,7 @@ export async function signUp(
     }
 
     // check if email already exists
-    const existingUserByEmail = await db.user.findUnique({
-      where: {
-        email: result.data.email,
-      },
-    });
+    const existingUserByEmail = await getUserByEmail(result.data.email);
     if (existingUserByEmail) {
       return {
         errors: {
@@ -72,7 +67,7 @@ export async function signUp(
     }
 
     // encrypt the password
-    const hashedPassword = await hash(result.data.password, 10);
+    const hashedPassword = await bcryptjs.hash(result.data.password, 10);
 
     // create a user
     await db.user.create({
