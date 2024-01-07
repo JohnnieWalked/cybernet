@@ -27,6 +27,10 @@ export default function AuthForm() {
     if (formSignUpState.success) {
       setFormType('signin');
       toast.success('Successful registration!');
+      toast.warning('We have sent You an email. Please, verify.');
+    }
+    if (!formSignInState.success) {
+      toast.error('');
     }
   }, [formSignUpState]);
 
@@ -34,15 +38,19 @@ export default function AuthForm() {
   const renderedSignInForm = (
     <>
       <form className="flex flex-col" action={signInAction}>
-        <Input type="text" name="signin" label="Username or email" />
-        <Input type="password" name="password" label="Password" />
+        <Input
+          errors={formSignInState.errors._form}
+          type="text"
+          name="signin"
+          label="Username or email"
+        />
+        <Input
+          errors={formSignInState.errors._form}
+          type="password"
+          name="password"
+          label="Password"
+        />
         <FormButtonPrimary>Sign in</FormButtonPrimary>
-
-        {formSignInState.errors._form ? (
-          <div className=" bg-red-900 border rounded border-red-500 mt-2 p-2 text-red-300">
-            {formSignInState.errors._form.join(', ')}
-          </div>
-        ) : null}
       </form>
       <div className="flex mt-10 justify-center items-center text-lg">
         <button
@@ -89,13 +97,14 @@ export default function AuthForm() {
           name="repeatPassword"
           label="Repeat Password"
         />
-        <FormButtonPrimary>Sign Up</FormButtonPrimary>
 
         {formSignUpState.errors._form ? (
           <div className=" bg-red-900 border rounded border-red-500 mt-2 p-2 text-red-300">
             {formSignUpState.errors._form.join(', ')}
           </div>
         ) : null}
+
+        <FormButtonPrimary>Sign Up</FormButtonPrimary>
       </form>
       <div className="flex mt-10 justify-center items-center text-lg">
         <button

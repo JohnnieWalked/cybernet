@@ -4,6 +4,7 @@ import { db } from '@/db';
 import bcryptjs from 'bcryptjs';
 import { SignUpSchema } from '@/schemas';
 import { getUserByEmail, getUserByUsername } from '@/data/user';
+import { generateVerificationToken } from '@/data/tokens';
 
 type SignUpProps = {
   success?: boolean;
@@ -78,6 +79,10 @@ export async function signUp(
         password: hashedPassword,
       },
     });
+
+    const verificationToken = await generateVerificationToken(
+      result.data.email
+    );
   } catch (error: unknown) {
     if (error instanceof Error) {
       return {

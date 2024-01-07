@@ -1,36 +1,43 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# CYBERNET 
 
-## Getting Started
 
-First, run the development server:
+**"CyberNet"** is a custom web messanger app developed with Next.js  and Auth.js in "*Cyberpunk 2077*" style.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+---
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Tech Stack
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+**Primary:**
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+- Next.js (app router, 14.0.4);
+- Auth.js (^5.0.0-beta.4);
+- React library;
+- Postgresql (DB located on website "Supabase");
+- ORM Prisma;
+- auth/prisma-adapter;
+- bcryptjs;
+- uuid;
 
-## Learn More
+**Secondary:**
 
-To learn more about Next.js, take a look at the following resources:
+- zod;
+- sass;
+- tailwind;
+- react-icons;
+- react-spinners;
+- react-transition-group;
+- react-toastify;
+- next-ui.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+---
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+## Technical Explanation
 
-## Deploy on Vercel
+### Sign in / Sign up functionality
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+**Sign in** and **Sign up** forms are located in component ***AuthForm.tsx***. To implement logging and registration we will use server actions, which are provided by Next.js. To manage states of forms with server actions we will use react-dom hook "useFormState". Server actions are located in folder "*actions*" in files called "*login.ts*" and "*sign-up.ts*".
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+Validating form fields will be in server actions using **ZOD**. All zod schemas are located in folder "*schemas*".
+
+
+

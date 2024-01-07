@@ -2,11 +2,10 @@
 
 import { signIn } from '@/auth';
 import { AuthError } from 'next-auth';
-import { paths } from '@/routes';
 import { SignInSchema } from '@/schemas';
 import { getUserByEmail, getUserByUsername } from '@/data/user';
 import { User } from '@prisma/client';
-import { redirect } from 'next/navigation';
+import { generateVerificationToken } from '@/data/tokens';
 
 type LoginProps = {
   errors: {
@@ -14,6 +13,7 @@ type LoginProps = {
     password?: string[];
     _form?: string[]; // _form used for specific errors (not user's mistake: for example unknown errors)
   };
+  success?: boolean;
 };
 
 export async function login(
@@ -34,19 +34,28 @@ export async function login(
 
   let user: User | null;
 
+  result.data.signin.includes('@')
+    ? (user = await getUserByEmail(result.data.signin))
+    : (user = await getUserByUsername(result.data.signin));
+
+  if (!user) {
+    return {
+      errors: {
+        _form: ['Invalid credentials!'],
+      },
+    };
+  }
+
+  if (!user.emailVerified) {
+    const verificationToken = generateVerificationToken(user.email);
+
+    return {
+      errors: {},
+      success: false,
+    };
+  }
+
   try {
-    result.data.signin.includes('@')
-      ? (user = await getUserByEmail(result.data.signin))
-      : (user = await getUserByUsername(result.data.signin));
-
-    if (!user) {
-      return {
-        errors: {
-          _form: ['Invalid credentials!'],
-        },
-      };
-    }
-
     await signIn('credentials', {
       signin: result.data.signin,
       password: result.data.password,
@@ -68,13 +77,13 @@ export async function login(
           };
       }
     } else {
-      return {
-        errors: {
-          _form: [JSON.stringify(error)],
-        },
-      };
+      throw error;
     }
   }
 
-  redirect(paths.userHomePage(user.username));
+  return {
+    errors: {
+      _form: ['Oops, something went wrong.'],
+    },
+  };
 }

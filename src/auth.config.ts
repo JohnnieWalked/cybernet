@@ -16,7 +16,6 @@ export default {
           const { signin, password } = validatedFieds.data;
 
           let user: User | null;
-
           signin.includes('@')
             ? (user = await getUserByEmail(signin))
             : (user = await getUserByUsername(signin));
