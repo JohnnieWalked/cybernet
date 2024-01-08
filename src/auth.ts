@@ -21,10 +21,18 @@ export const {
 } = NextAuth({
   callbacks: {
     async session({ token, session }) {
+      /*       
+        assign to session new data -> userid;
+        By default, session consists of: {
+          user: {name, email, image},
+          "expires": "datetime"
+        } 
+      */
       if (token.sub && session.user) {
         session.user.id = token.sub;
       }
 
+      /* assign to session new data -> username */
       if (token.username && session.user) {
         session.user.username = token.username as string; // AUTH.JS BUG -> extending JWT interface doesn't work, so we set types as string
       }
@@ -33,12 +41,15 @@ export const {
       return session;
     },
     async jwt({ token }) {
+      /* token.sub is a userid from DB */
       if (!token.sub) return token;
 
+      /* get user from db using this sub */
       const existingUser = await getUserById(token.sub);
 
       if (!existingUser) return token;
 
+      /* assign to token-obj new data -> username */
       token.username = existingUser.username;
 
       return token;

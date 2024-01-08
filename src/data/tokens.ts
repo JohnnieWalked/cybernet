@@ -3,6 +3,12 @@ import { v4 as uuidv4 } from 'uuid';
 import { db } from '@/db';
 import { getVerificationTokenByEmail } from './verification-token';
 
+/**
+ * Generate verification token. If token was already sent -> delete previous and send new one.
+ * @param email[string]
+ * @type {string}
+ * @returns {verificationToken}
+ */
 export async function generateVerificationToken(email: string) {
   const token = uuidv4();
   const expires = new Date(new Date().getTime() + 3600 * 1000); //expire token in 1 hour
