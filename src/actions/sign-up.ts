@@ -4,7 +4,8 @@ import { db } from '@/db';
 import bcryptjs from 'bcryptjs';
 import { SignUpSchema } from '@/schemas';
 import { getUserByEmail, getUserByUsername } from '@/data/user';
-import { generateVerificationToken } from '@/data/tokens';
+import { generateVerificationToken } from '@/lib/tokens';
+import { sendVerificationEmail } from '@/lib/mail';
 
 type SignUpProps = {
   success?: boolean;
@@ -82,6 +83,11 @@ export async function signUp(
 
     const verificationToken = await generateVerificationToken(
       result.data.email
+    );
+
+    await sendVerificationEmail(
+      verificationToken.email,
+      verificationToken.token
     );
   } catch (error: unknown) {
     if (error instanceof Error) {

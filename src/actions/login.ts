@@ -5,7 +5,8 @@ import { AuthError } from 'next-auth';
 import { SignInSchema } from '@/schemas';
 import { getUserByEmail, getUserByUsername } from '@/data/user';
 import { User } from '@prisma/client';
-import { generateVerificationToken } from '@/data/tokens';
+import { generateVerificationToken } from '@/lib/tokens';
+import { sendVerificationEmail } from '@/lib/mail';
 
 type LoginProps = {
   errors: {
@@ -47,7 +48,12 @@ export async function login(
   }
 
   if (!user.emailVerified) {
-    const verificationToken = generateVerificationToken(user.email);
+    const verificationToken = await generateVerificationToken(user.email);
+
+    await sendVerificationEmail(
+      verificationToken.email,
+      verificationToken.token
+    );
 
     return {
       errors: {},

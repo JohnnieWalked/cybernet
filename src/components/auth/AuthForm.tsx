@@ -29,10 +29,10 @@ export default function AuthForm() {
       toast.success('Successful registration!');
       toast.warning('We have sent You an email. Please, verify.');
     }
-    if (!formSignInState.success) {
-      toast.error('');
+    if (formSignInState.success === false) {
+      toast.warning('Confirmation email sent! Please, confirm before proceed.');
     }
-  }, [formSignUpState]);
+  }, [formSignUpState, formSignInState]);
 
   /* signin form */
   const renderedSignInForm = (

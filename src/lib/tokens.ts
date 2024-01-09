@@ -1,7 +1,7 @@
 import { v4 as uuidv4 } from 'uuid';
 
 import { db } from '@/db';
-import { getVerificationTokenByEmail } from './verification-token';
+import { getVerificationTokenByEmail } from '../data/verification-token';
 
 /**
  * Generate verification token. If token was already sent -> delete previous and send new one.
