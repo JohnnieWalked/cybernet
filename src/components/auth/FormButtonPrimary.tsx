@@ -11,11 +11,7 @@ export default function FormButtonPrimary({ children }: FormButtonProps) {
   const { pending } = useFormStatus();
 
   return (
-    <button
-      disabled={pending}
-      type="submit"
-      className=" flex items-center justify-center cybr-btn bg-cyan-600"
-    >
+    <button disabled={pending} type="submit" className="cybr-btn bg-cyan-600">
       {pending ? (
         <BarLoader height={'7px'} width="60%" color="var(--yellow)" />
       ) : (

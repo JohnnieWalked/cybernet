@@ -6,8 +6,6 @@ import { getVerificationTokenByEmail } from '../data/verification-token';
 /**
  * Generate verification token. If token was already sent -> delete previous and send new one.
  * @param email[string]
- * @type {string}
- * @returns {verificationToken}
  */
 export async function generateVerificationToken(email: string) {
   const token = uuidv4();

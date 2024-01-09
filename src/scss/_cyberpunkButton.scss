@@ -148,7 +148,8 @@
 }
 
 .cybr-btn:before {
-  background: var(--shadow-primary);
+  /* temporary disabled cause of not fitting fully */
+  // background: var(--shadow-primary);
   transform: translate(var(--border), 0);
 }
 

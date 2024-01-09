@@ -47,6 +47,7 @@ export async function login(
     };
   }
 
+  /* if user doesnt verify email -> send email again */
   if (!user.emailVerified) {
     const verificationToken = await generateVerificationToken(user.email);
 

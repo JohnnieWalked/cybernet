@@ -24,10 +24,6 @@ export default auth((req) => {
   if (!isLoggedIn && !isPublicRoutes) {
     return Response.redirect(new URL(paths.loginPage(), nextUrl));
   }
-
-  console.log('LOGIN STATUS:', isLoggedIn);
-  console.log('ROUTE:', nextUrl.pathname);
-
   return null;
 });
 
