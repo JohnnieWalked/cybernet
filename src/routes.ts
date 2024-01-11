@@ -23,4 +23,20 @@ export const paths = {
   userHomePage() {
     return `/home`;
   },
+
+  userFriends() {
+    return `/home/friends`;
+  },
+
+  userMail() {
+    return `/home/mail`;
+  },
+
+  userSettings() {
+    return `/home/settings`;
+  },
+
+  info() {
+    return `/home/info`;
+  },
 };

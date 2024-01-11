@@ -18,3 +18,12 @@
 .popUpFromBottom {
   bottom: 3%;
 }
+
+.active {
+  &_menubar-link {
+    transition: all 0.2s ease-in-out;
+    color: var(--cyan);
+    border-top: 2px solid var(--cyan) !important;
+    filter: drop-shadow(0px 0px 10px var(--cyan));
+  }
+}

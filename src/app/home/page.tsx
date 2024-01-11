@@ -1,6 +1,6 @@
 import { auth, signOut } from '@/auth';
 
-export default async function UserHomePage() {
+export default async function HomePage() {
   const session = await auth();
   return (
     <div>

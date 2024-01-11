@@ -1,0 +1,22 @@
+.menubar {
+  &_wrapper {
+    a {
+      position: relative;
+      transition: all 0.2s ease-in-out;
+      border-top: 2px solid transparent;
+      svg {
+        box-sizing: content-box;
+        padding-top: 25px;
+        padding-bottom: 25px;
+        width: 2.2rem;
+        height: 2.2rem;
+        cursor: pointer;
+        transition: color 0.2s ease-out;
+
+        &:hover {
+          color: var(--cyan);
+        }
+      }
+    }
+  }
+}

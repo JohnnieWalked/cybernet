@@ -4,5 +4,6 @@
 
 :root {
   --yellow: #fff001;
+  --cyan: rgb(34, 211, 238);
   --toastify-font-family: '__Inter_e66fe9', '__Inter_Fallback_e66fe9' !important;
 }

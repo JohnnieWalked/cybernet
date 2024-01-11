@@ -10,6 +10,9 @@ const config: Config = {
   ],
   theme: {
     extend: {
+      dropShadow: {
+        'menu-top': '0px 7px 30px rgb(34, 211, 238)',
+      },
       backgroundImage: {
         'home-bg': "url('/imgs/cyberpunk-bg.jpg')",
         'gif-verify': "url('/imgs/bg-gif.webp')",
