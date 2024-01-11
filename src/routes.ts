@@ -20,7 +20,7 @@ export const paths = {
   /**
    * The default redirect path after logging in.
    */
-  userHomePage(usernameSlug: string) {
-    return `/${usernameSlug}`;
+  userHomePage() {
+    return `/home`;
   },
 };

@@ -49,7 +49,6 @@ export const {
         session.user.username = token.username as string; // AUTH.JS BUG -> extending JWT interface doesn't work, so we set types as string
       }
 
-      console.log({ sessionToken: token });
       return session;
     },
     async jwt({ token }) {

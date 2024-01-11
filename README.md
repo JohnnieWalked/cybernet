@@ -73,7 +73,80 @@ Validating form fields will be in server actions using **ZOD**. All zod schemas 
   - Secondary, "**session()**" which receives token, modify session with token-data and returns session;
 - And finally -> executing auth() from `middleware.ts`;
 
-  
+---
+
+### Verification functionality
+
+Verification token will be created after register in separate table `VerificationToken` during registration.
+
+```js
+const verificationToken = await generateVerificationToken(
+  result.data.email
+);
+
+await sendVerificationEmail(
+  verificationToken.email,
+  verificationToken.token
+);
+```
+
+If user doesn't verify email, the another one will be sent and new verification token will be generated.
+Token will be created in file `lib/tokens.ts` by function *`generateVerificationToken(email: string)`* using `uuid` library.
+
+```ts
+export async function generateVerificationToken(email: string) {
+  const token = uuidv4();
+  const expires = new Date(new Date().getTime() + 3600 * 1000); //expire token in 1 hour
+
+  /**
+   * Check if we already sent token to email
+   */
+  const existingToken = await getVerificationTokenByEmail(email);
+  if (existingToken) {
+    await db.verificationToken.delete({
+      where: {
+        id: existingToken.id,
+      },
+    });
+  }
+
+  const verificationToken = await db.verificationToken.create({
+    data: {
+      email,
+      token,
+      expires,
+    },
+  });
+
+  return verificationToken;
+}
+```
+
+Sending verification emails is implemented using Nodemailer in file `lib/mail.ts`.
+After clicking on verifying email from user's native mail -> redirect to page `/auth/new-verification`, where automatically will be triggered server action `verificationToken` from file `actions/new-verification`.
+In this server action we will get token from DB using token we sent to user (in verification email). After cheking we add new Date to User DB in field emailVerified. 
+
+And one more important thing, that we will update email. The reason is whenever the user wants to change email in settings, we won't immediately update his email in our DB. Instead, we will send new verification email with token to that email, and update after verification.
+
+```ts
+/* 
+  update date in user DB from null to date of verification; 
+  also update email (in case user will change email in future) 
+*/
+await db.user.update({
+  where: { id: existingUser.id },
+  data: {
+    emailVerified: new Date(),
+    email: existingToken.email,
+  },
+});
+
+await db.verificationToken.delete({
+  where: { id: existingToken.id },
+});
+```
+
+
 
 
 
