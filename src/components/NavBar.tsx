@@ -11,13 +11,14 @@ import { IoMdMail } from 'react-icons/io';
 import { IoIosMailOpen } from 'react-icons/io';
 import { IoMdSettings } from 'react-icons/io';
 import { FaCircleInfo } from 'react-icons/fa6';
+import { IoIosMusicalNotes } from 'react-icons/io';
 
-export default function MenuBar() {
+export default function NavBar() {
   const pathname = usePathname();
 
   return (
-    <div className="menubar_wrapper fixed w-screen bg-neutral-950 bottom-0 text-white text-center z-10 grid place-items-center">
-      <div className="flex items-center justify-center gap-10 w-max">
+    <div className="menubar_wrapper fixed w-screen h-20 bg-neutral-900 bottom-0 text-white text-center z-10 grid place-items-center">
+      <div className="flex w-full h-full items-center justify-center gap-10">
         <Link
           className={`menubar-link ${
             pathname === '/home' ? 'active_menubar-link' : ''
@@ -52,6 +53,15 @@ export default function MenuBar() {
           href={paths.userSettings()}
         >
           <IoMdSettings />
+        </Link>
+
+        <Link
+          className={`menubar-link ${
+            pathname.includes('/music') ? 'active_menubar-link' : ''
+          }`}
+          href={paths.music()}
+        >
+          <IoIosMusicalNotes />
         </Link>
 
         <Link

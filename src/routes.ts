@@ -39,4 +39,8 @@ export const paths = {
   info() {
     return `/home/info`;
   },
+
+  music() {
+    return `/home/music`;
+  },
 };

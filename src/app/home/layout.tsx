@@ -1,4 +1,4 @@
-import MenuBar from '@/components/MenuBar';
+import NavBar from '@/components/NavBar';
 
 export default async function UserLayout({
   children,
@@ -7,8 +7,8 @@ export default async function UserLayout({
 }) {
   return (
     <div className="before:absolute before:inset-0 before:bg-slate-800 before:w-screen before:h-screen before:-z-10">
-      <MenuBar />
       {children}
+      <NavBar />
     </div>
   );
 }

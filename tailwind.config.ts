@@ -12,6 +12,7 @@ const config: Config = {
     extend: {
       dropShadow: {
         'menu-top': '0px 7px 30px rgb(34, 211, 238)',
+        avatar: '0px 0px 10px rgb(34, 211, 238)',
       },
       backgroundImage: {
         'home-bg': "url('/imgs/cyberpunk-bg.jpg')",
