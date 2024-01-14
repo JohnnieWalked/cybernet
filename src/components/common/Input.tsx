@@ -5,11 +5,17 @@ type InputProps = {
   label: string;
   type: 'text' | 'password';
   errors?: string[];
+  classWrapper?: string;
 };
 
 export default function Input(props: InputProps) {
   return (
-    <div className="flex flex-col relative form-focus transition-all mb-12">
+    <div
+      className={
+        `flex flex-col relative form-focus transition-all mb-12 ` +
+        props.classWrapper
+      }
+    >
       <input
         className=" bg-transparent p-1 border-b-2 outline-none focus:border-cyan-300 transition-all"
         type={props.type}

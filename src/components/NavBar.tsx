@@ -5,13 +5,14 @@ import Link from 'next/link';
 import { paths } from '@/routes';
 
 /* icons */
-import { FaHome } from 'react-icons/fa';
-import { FaUserFriends } from 'react-icons/fa';
-import { IoMdMail } from 'react-icons/io';
-import { IoIosMailOpen } from 'react-icons/io';
-import { IoMdSettings } from 'react-icons/io';
+import { FaHome, FaUserFriends } from 'react-icons/fa';
+import {
+  IoMdMail,
+  IoIosMailOpen,
+  IoMdSettings,
+  IoIosMusicalNotes,
+} from 'react-icons/io';
 import { FaCircleInfo } from 'react-icons/fa6';
-import { IoIosMusicalNotes } from 'react-icons/io';
 
 export default function NavBar() {
   const pathname = usePathname();
