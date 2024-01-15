@@ -11,14 +11,14 @@ export default function UserAvatar({ avatarSRC, children }: UserAvatarProps) {
     <div className="h-full drop-shadow-avatar self-center border-cyan-800 rounded">
       {avatarSRC ? (
         <Image
-          className=" h-full w-auto"
+          className="w-auto h-full object-contain"
           priority
           src={avatarSRC}
           alt="User Avatar"
         />
       ) : (
         <Image
-          className=" h-full w-auto"
+          className="w-auto h-full object-contain"
           src={standartAvatar}
           alt="Standart Avatar"
           priority

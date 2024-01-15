@@ -11,14 +11,15 @@ datasource db {
 }
 
 model User {
-  id            String    @id @default(cuid())
-  name          String?
-  username      String    @unique
-  email         String    @unique
-  password      String
-  emailVerified DateTime?
-  image         String?
-  friends       Friend[]
+  id             String    @id @default(cuid())
+  name           String?
+  username       String    @unique
+  email          String    @unique
+  password       String
+  emailVerified  DateTime?
+  image          String?
+  friends        User[]    @relation("friends")
+  friendsAddedMe User[]    @relation("friends")
 }
 
 model VerificationToken {
@@ -28,11 +29,4 @@ model VerificationToken {
   expires DateTime
 
   @@unique([email, token]) // unique token per email
-}
-
-model Friend {
-  id        String   @id @default(cuid())
-  friend    User     @relation(fields: [friendId], references: [id])
-  friendId  String
-  createdAt DateTime @default(now())
 }

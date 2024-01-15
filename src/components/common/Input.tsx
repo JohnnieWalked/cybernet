@@ -1,6 +1,9 @@
-/* INPUT component - used in login/signup forms */
+'use client';
+
+import { useRef } from 'react';
 
 type InputProps = {
+  setInputValue?: (value: string) => void;
   name: string;
   label: string;
   type: 'text' | 'password';
@@ -9,6 +12,14 @@ type InputProps = {
 };
 
 export default function Input(props: InputProps) {
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  const handleInputChange = () => {
+    if (!inputRef.current) return;
+    const value = inputRef.current.value;
+    if (props.setInputValue) props.setInputValue(value);
+  };
+
   return (
     <div
       className={
@@ -17,6 +28,8 @@ export default function Input(props: InputProps) {
       }
     >
       <input
+        onChange={handleInputChange}
+        ref={inputRef}
         className=" bg-transparent p-1 border-b-2 outline-none focus:border-cyan-300 transition-all"
         type={props.type}
         name={props.name}

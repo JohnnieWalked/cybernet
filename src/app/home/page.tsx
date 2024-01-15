@@ -16,7 +16,7 @@ export default function HomePage() {
       <Title>Home</Title>
 
       {userData ? (
-        <div className="grid grid-rows-[300px_1fr] grid-cols-[auto_minmax(500px,_1fr)] gap-x-10">
+        <div className="grid grid-rows-[minmax(150px,_300px)_1fr] grid-cols-[1fr_minmax(150px,_1fr)] gap-x-10">
           <UserAvatar avatarSRC={userData.image} />
 
           <div className=" flex flex-col gap-3">
@@ -27,7 +27,10 @@ export default function HomePage() {
             <h3 className=" text-lg text-gray-300">
               Username: <span className="italic">{userData.username}</span>
               <br />
-              Email: <span className="italic">{userData.email}</span>
+              Email:{' '}
+              <span className="italic text-ellipsis break-words">
+                {userData.email}
+              </span>
             </h3>
           </div>
         </div>
