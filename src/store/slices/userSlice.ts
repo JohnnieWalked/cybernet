@@ -12,7 +12,7 @@ const initialState: UserSliceType = {
 };
 
 export const userSlice = createSlice({
-  name: 'session',
+  name: 'user',
   initialState,
   reducers: {
     uploadSession: (state, action: PayloadAction<Session['user']>) => {
