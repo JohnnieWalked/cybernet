@@ -24,7 +24,10 @@ export const paths = {
     return `/home`;
   },
 
-  userFriends() {
+  userFriends(friend?: string) {
+    if (friend) {
+      return `/home/friends?term=${friend}`;
+    }
     return `/home/friends`;
   },
 

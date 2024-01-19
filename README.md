@@ -1,7 +1,6 @@
-# CYBERNET 
+# CYBERNET
 
-
-**"CyberNet"** is a custom web messanger app developed with Next.js  and Auth.js in "*Cyberpunk 2077*" style.
+**"CyberNet"** is a custom web messenger app developed with Next.js  and Auth.js in "*Cyberpunk 2077*" style.
 
 ---
 
@@ -124,7 +123,7 @@ export async function generateVerificationToken(email: string) {
 
 Sending verification emails is implemented using Nodemailer in file `lib/mail.ts`.
 After clicking on verifying email from user's native mail -> redirect to page `/auth/new-verification`, where automatically will be triggered server action `verificationToken` from file `actions/new-verification`.
-In this server action we will get token from DB using token we sent to user (in verification email). After cheking we add new Date to User DB in field emailVerified. 
+In this server action we will get token from DB using token we sent to user (in verification email). After cheking we add new Date to User DB in field emailVerified.
 
 And one more important thing, that we will update email. The reason is whenever the user wants to change email in settings, we won't immediately update his email in our DB. Instead, we will send new verification email with token to that email, and update after verification.
 
@@ -145,8 +144,3 @@ await db.verificationToken.delete({
   where: { id: existingToken.id },
 });
 ```
-
-
-
-
-

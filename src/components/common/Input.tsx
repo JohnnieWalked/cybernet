@@ -1,9 +1,10 @@
 'use client';
 
-import { useRef } from 'react';
+import { useRef, useEffect, useState } from 'react';
 
 type InputProps = {
-  setInputValue?: (value: string) => void;
+  passValueToParent?: (value: string | undefined) => void;
+  defaultValue?: string;
   name: string;
   label: string;
   type: 'text' | 'password';
@@ -13,12 +14,22 @@ type InputProps = {
 
 export default function Input(props: InputProps) {
   const inputRef = useRef<HTMLInputElement>(null);
+  const [inputValue, setInputValue] = useState<string | undefined>();
 
-  const handleInputChange = () => {
+  const handleInputChange = (value: string) => {
     if (!inputRef.current) return;
-    const value = inputRef.current.value;
-    if (props.setInputValue) props.setInputValue(value);
+    setInputValue(value);
   };
+
+  /* debounce */
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      if (!props.passValueToParent) return;
+      props.passValueToParent(inputValue);
+    }, 1500);
+
+    return () => clearTimeout(timeoutId);
+  }, [inputValue, props]);
 
   return (
     <div
@@ -28,7 +39,8 @@ export default function Input(props: InputProps) {
       }
     >
       <input
-        onChange={handleInputChange}
+        defaultValue={props.defaultValue}
+        onChange={(e) => handleInputChange(e.target.value)}
         ref={inputRef}
         className=" bg-transparent p-1 border-b-2 outline-none focus:border-cyan-300 transition-all"
         type={props.type}
