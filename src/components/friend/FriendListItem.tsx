@@ -3,26 +3,33 @@ import UserAvatar from '../user/UserAvatar';
 import { FiClock } from 'react-icons/fi';
 
 type FriendListItemProps = {
-  friend: Session['user'];
-  friendsAddedMe?: {
-    id: string;
-  }[];
+  user: Session['user'];
+  friendAlready?: boolean;
+  acceptFriendRequest?: boolean;
+  friendYouSentRequestTo?: boolean;
 };
 
 export default async function FriendListItem({
-  friend,
-  friendsAddedMe,
+  user,
+  friendAlready,
+  acceptFriendRequest,
+  friendYouSentRequestTo,
 }: FriendListItemProps) {
-  const isFriendAddedMe = () => {
-    if (!friendsAddedMe) return;
-    if (
-      !friendsAddedMe.find((item) => {
-        return item.id === friend.id;
-      })
-    ) {
+  const renderFriendStatus = () => {
+    if (friendAlready) {
+      return;
+    }
+    if (acceptFriendRequest) {
       return (
-        <div className="relative flex justify-center items-center row-start-1 row-end-3 gap-3 underline underline-offset-4 cursor-pointer ">
-          Request sent <FiClock />
+        <div className="relative w-auto h-auto flex justify-center items-center row-start-1 row-end-3 hover:underline hover:underline-offset-4 cursor-pointer">
+          Accept request
+        </div>
+      );
+    }
+    if (friendYouSentRequestTo) {
+      return (
+        <div className="relative flex w-auto h-auto justify-center items-center row-start-1 row-end-3 cursor-pointer hover:underline hover:underline-offset-4">
+          Request sent
         </div>
       );
     }
@@ -31,13 +38,13 @@ export default async function FriendListItem({
   return (
     <li className="grid relative grid-cols-[auto_1fr] grid-flow-col grid-rows-[30px_30px] pb-4 gap-x-5 border-b-2 rounded-xl border-cyan-400 last-of-type:p-0 last-of-type:border-b-0">
       <div className="row-start-1 row-end-3">
-        <UserAvatar avatarSRC={friend.image} />
+        <UserAvatar avatarSRC={user.image} />
       </div>
       <div className=" font-medium text-lg self-end text-red-400">
-        {friend.name}
+        {user.name}
       </div>
-      <div className="self-start italic font-light">@{friend.username}</div>
-      {isFriendAddedMe()}
+      <div className="self-start italic font-light">@{user.username}</div>
+      {renderFriendStatus()}
     </li>
   );
 }

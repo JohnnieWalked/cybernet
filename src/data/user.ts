@@ -42,15 +42,13 @@ export async function getUserById(id: string) {
   }
 }
 
-export async function getUserFriendsById(id: string) {
+export async function getUserFriendsAndRelationsById(id: string) {
   try {
     const user = await db.user.findUnique({
       where: { id: id },
       select: {
         friends: true,
-        friendsAddedMe: {
-          select: { id: true },
-        },
+        friendsAddedMe: true,
       },
     });
 
@@ -60,7 +58,7 @@ export async function getUserFriendsById(id: string) {
   }
 }
 
-export async function getUseAndHisFriendsByUsername(username: string) {
+export async function getUserAndHisFriendsByUsername(username: string) {
   try {
     const user = await db.user.findUnique({
       where: { username: username },

@@ -4,7 +4,7 @@ import { Suspense } from 'react';
 import Title from '@/components/common/Title';
 import Loader from '@/components/common/Loader';
 import SearchInput from '@/components/common/SearchInput';
-import UserFriendsList from '@/components/user/UserFriendsList';
+import UserFriendsList from '@/components/friend/UserFriendsList';
 
 /* icons */
 import {
