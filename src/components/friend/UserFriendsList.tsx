@@ -1,8 +1,6 @@
 import { auth } from '@/auth';
-import {
-  getUserFriendsAndRelationsById,
-  getUserAndHisFriendsByUsername,
-} from '@/data/user';
+import { getUserFriendsAndRelationsById, getUserByUsername } from '@/data/user';
+import { checkRelationShipStatus } from '@/helpers/checkRelationShipStatus';
 
 /* components */
 import Loader from '../common/Loader';
@@ -25,58 +23,69 @@ export default async function UserFriendsList({
   const user = await getUserFriendsAndRelationsById(session.user.id);
   if (!user) return <div>Oops, nothing here...</div>;
   const { friends, friendsAddedMe } = user;
-
-  /** Users, whom You sent request. */
-  const sentRequestFriends = friends
-    .filter((friend) => !friendsAddedMe.includes(friend))
-    .map((user) => (
-      <FriendListItem key={user.username} user={user} friendYouSentRequestTo />
-    ));
+  const friendsStatus = checkRelationShipStatus(friends, friendsAddedMe);
 
   /** Users, that are already your friends. */
-  const friendsAlready = friends
-    .filter((friend) => friendsAddedMe.includes(friend))
-    .map((user) => (
-      <FriendListItem key={user.username} user={user} friendAlready />
-    ));
+  const friendsAlready = friendsStatus.friendsAlready.map((user) => (
+    <FriendListItem key={user.username} user={user} friendAlready />
+  ));
 
-  /** Users, that are awaiting your approval . */
-  const pendingApprovalFriends = friendsAddedMe
-    .filter((friendAddedMe) => !friends.includes(friendAddedMe))
-    .map((user) => (
+  /** Users, whom You sent request. */
+  const friendsYouSentRequestTo = friendsStatus.requestSendFriends.map(
+    (user) => (
+      <FriendListItem key={user.username} user={user} friendYouSentRequestTo />
+    )
+  );
+
+  /** Users, that are awaiting your approval. */
+  const friendsAwaitingApproval = friendsStatus.awaitingApprovalFriends.map(
+    (user) => (
       <FriendListItem key={user.username} user={user} acceptFriendRequest />
-    ));
+    )
+  );
 
   /* if search term in URL is empty => render all friends */
   if (!term) {
     return (
       <>
-        {pendingApprovalFriends} {friendsAlready} {sentRequestFriends}
+        {friendsAwaitingApproval}
+        {friendsAlready}
+        {friendsYouSentRequestTo}
       </>
     );
   }
 
-  // if (term) {
-  //   if (term.startsWith('@')) {
-  //     const findNewFriend = await getUserAndHisFriendsByUsername(
-  //       term.substring(1)
-  //     );
+  if (term) {
+    if (term.startsWith('@')) {
+      if (term.substring(1).toLowerCase() === session.user.username)
+        return <div>Oops, nothing here...</div>;
 
-  //     if (!findNewFriend) return <div>Oops, nothing here...</div>;
+      const findNewFriend = await getUserByUsername(term.substring(1));
 
-  //     const renderFindNewFriend = (
-  //       <FriendListItem key={findNewFriend.username} friend={findNewFriend} />
-  //     );
+      if (!findNewFriend) return <div>Oops, nothing here...</div>;
 
-  //     return <>{renderFindNewFriend}</>;
-  //   } else {
-  //     const renderedFriendsList = user.friends.map((friend) => {
-  //       if (friend.username.includes(term)) {
-  //         return <FriendListItem key={friend.username} friend={friend} />;
-  //       }
-  //     });
+      const renderFindNewFriend = (
+        <FriendListItem
+          key={findNewFriend.username}
+          user={findNewFriend}
+          isNewFriend
+        />
+      );
 
-  //     return <>{renderedFriendsList}</>;
-  //   }
-  // }
+      return <>{renderFindNewFriend}</>;
+    } else {
+      const renderedFriendsList = friends
+        .concat(friendsAddedMe)
+        .map((friend) => {
+          if (
+            friend.name.toLowerCase().includes(term) ||
+            friend.username.toLowerCase().includes(term)
+          ) {
+            return <FriendListItem key={friend.username} user={friend} />;
+          }
+        });
+
+      return <>{renderedFriendsList}</>;
+    }
+  }
 }

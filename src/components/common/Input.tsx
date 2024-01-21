@@ -26,7 +26,7 @@ export default function Input(props: InputProps) {
     const timeoutId = setTimeout(() => {
       if (!props.passValueToParent) return;
       props.passValueToParent(inputValue);
-    }, 1500);
+    }, 1000);
 
     return () => clearTimeout(timeoutId);
   }, [inputValue, props]);

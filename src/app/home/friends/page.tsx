@@ -39,7 +39,7 @@ export default async function FriendsPage({ searchParams }: FriendsPageParams) {
           <RxCornerTopLeft className=" h-10 w-auto" />
           <RxCornerTopRight className=" h-10 w-auto justify-self-end" />
 
-          <div className=" px-10 col-start-1 col-end-3 h-auto transition-all">
+          <div className="grid px-10 col-start-1 col-end-3 h-auto transition-all gap-y-7">
             <UserFriendsList searchParams={searchParams} />
           </div>
 
