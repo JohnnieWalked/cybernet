@@ -8,7 +8,5 @@ export async function searchForFriend(value: string) {
     console.log(value);
     redirect(paths.userFriends());
   }
-
-  console.log(value);
   redirect(paths.userFriends(value));
 }

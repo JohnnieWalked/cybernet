@@ -49,6 +49,10 @@ export const {
         session.user.username = token.username as string; // AUTH.JS BUG -> extending JWT interface doesn't work, so we set types as string
       }
 
+      if (token.picture && session.user) {
+        session.user.image = token.picture;
+      }
+
       return session;
     },
     async jwt({ token }) {
@@ -60,8 +64,9 @@ export const {
 
       if (!existingUser) return token;
 
-      /* assign to token-obj new data -> username */
+      /* assign to token-obj new data */
       token.username = existingUser.username;
+      token.picture = existingUser.image;
 
       return token;
     },

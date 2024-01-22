@@ -144,3 +144,38 @@ await db.verificationToken.delete({
   where: { id: existingToken.id },
 });
 ```
+
+---
+
+### Friend List Functionality
+
+By default, user has additional two columns, which represent his relations with another users. Check out Prisma schema below. `prisma/schema.prisma`:
+
+```prisma
+  model User {
+    id             String    @id @default(cuid())
+    name           String
+    username       String    @unique
+    email          String    @unique
+    password       String
+    emailVerified  DateTime?
+    image          String?
+    friends        User[]    @relation("friends")
+    friendsAddedMe User[]    @relation("friends")
+  }
+```
+
+According to schema, we are using an explicit many-to-many (*`m-n`*) relations between the `User` entity and itself through the `friends` and `friendsAddedMe`:
+
+- `friends` represents who user added to his friend list;
+- `friendsAddedMe` represents who added user to their friend list;
+
+So, to be more precise, let's imagine two users: *Johnny* and *Panam*.
+
+- If *Johnny* has *Panam* in `friends`, BUT DOES NOT have in `friendsAddedMe` -> means *Johnny* sent friend request to *Panam*.
+- If *Johnny* has *Panam* in `friendsAddedMe`, BUT DOES NOT have in `friends` -> means *Panam* sent friend request to *Johnny*.
+- If *Johnny* has *Panam* in `friends`, AND has in `friendsAddedMe` -> means *Panam* and *Johnny* are friends. (Same must be for *Panam*.)
+
+![Friend list functionality](<Friends func.gif>)
+
+---

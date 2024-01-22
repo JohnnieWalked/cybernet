@@ -16,12 +16,12 @@ export default async function HomePage() {
 
       <div className="grid grid-rows-[minmax(150px,_300px)_1fr] grid-cols-[1fr_minmax(150px,_1fr)] gap-x-10">
         <UserAvatar
-          imageClasses="drop-shadow-avatar"
+          imageClasses="border rounded border-2 border-[var(--cyan)] drop-shadow-avatar"
           avatarSRC={session.user.image}
         />
 
         <div className=" flex flex-col gap-3">
-          <h2 className=" text-red-400 text-3xl font-medium border-b-2 pb-1 rounded border-cyan-400">
+          <h2 className=" text-red-400 text-3xl font-medium border-b-2 pb-1 rounded border-cyan-600">
             {session.user.name}
           </h2>
 
