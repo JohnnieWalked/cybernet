@@ -2,7 +2,6 @@ import { Suspense } from 'react';
 
 /* components */
 import Title from '@/components/common/Title';
-import Loader from '@/components/common/Loader';
 import SearchInput from '@/components/common/SearchInput';
 import UserFriendsList from '@/components/friend/UserFriendsList';
 
@@ -25,7 +24,7 @@ export default async function FriendsPage({ searchParams }: FriendsPageParams) {
     <div className="flex flex-col justify-center items-center gap-20 transition-all">
       <Title>My Friends</Title>
       <div className="flex flex-col justify-center items-center gap-4">
-        <Suspense>
+        <Suspense fallback={'Loading...'}>
           <SearchInput />
         </Suspense>
 
@@ -40,7 +39,9 @@ export default async function FriendsPage({ searchParams }: FriendsPageParams) {
           <RxCornerTopRight className=" h-10 w-auto justify-self-end" />
 
           <div className="grid px-10 col-start-1 col-end-3 h-auto transition-all gap-y-7">
-            <UserFriendsList searchParams={searchParams} />
+            <Suspense fallback={'Loading...'}>
+              <UserFriendsList searchParams={searchParams} />
+            </Suspense>
           </div>
 
           <RxCornerBottomLeft className=" h-10 w-auto" />

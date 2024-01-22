@@ -5,3 +5,4 @@ export { signOut } from './sign-out';
 export { searchForFriend } from './search-for-friend';
 export { acceptRequest } from './accept-request';
 export { sendRequest } from './send-request';
+export { removeFriend } from './remove-friend';

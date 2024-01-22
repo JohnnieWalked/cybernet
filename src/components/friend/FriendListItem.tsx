@@ -1,7 +1,11 @@
 'use client';
 
+/* types */
 import type { Session } from 'next-auth/types';
+
+/* components */
 import UserAvatar from '../user/UserAvatar';
+
 import { toast } from 'react-toastify';
 import * as actions from '@/actions';
 
@@ -51,12 +55,34 @@ export default function FriendListItem({
       .catch((e) => toast.error(e));
   };
 
+  const handleRemoveFriend = () => {
+    actions
+      .removeFriend(user)
+      .then((data) => {
+        if (data.error) {
+          toast.error(data.error);
+        }
+        if (data.success) {
+          toast.success(data.success);
+        }
+      })
+      .catch((e) => toast.error(e));
+  };
+
   const renderFriendStatus = () => {
     if (friendAlready) {
       return (
-        <div className="relative w-auto h-auto flex justify-center items-center row-start-1 row-end-3 hover:underline hover:underline-offset-4 cursor-pointer">
-          Remove
-        </div>
+        <form
+          action={handleRemoveFriend}
+          className="relative w-auto h-auto flex justify-center items-center row-start-1 row-end-3 "
+        >
+          <button
+            type="submit"
+            className="hover:underline hover:underline-offset-4 cursor-pointer"
+          >
+            Remove
+          </button>
+        </form>
       );
     }
     if (acceptFriendRequest) {
@@ -76,7 +102,7 @@ export default function FriendListItem({
     }
     if (friendYouSentRequestTo) {
       return (
-        <div className="relative text-gray-400 flex w-auto h-auto justify-center items-center row-start-1 row-end-3 cursor-pointer hover:underline hover:underline-offset-4">
+        <div className="relative text-gray-400 flex w-auto h-auto justify-center items-center row-start-1 row-end-3">
           Request sent
         </div>
       );

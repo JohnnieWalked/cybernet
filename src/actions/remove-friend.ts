@@ -6,7 +6,7 @@ import { auth } from '@/auth';
 import { revalidatePath } from 'next/cache';
 import { paths } from '@/routes';
 
-export async function acceptRequest(user: Session['user']) {
+export async function removeFriend(user: Session['user']) {
   const session = await auth();
 
   if (!session) return { error: 'User not logged in!' };
@@ -18,8 +18,24 @@ export async function acceptRequest(user: Session['user']) {
       },
       data: {
         friends: {
-          connect: {
+          disconnect: {
             id: user.id,
+          },
+        },
+      },
+      include: {
+        friends: true,
+      },
+    });
+
+    await db.user.update({
+      where: {
+        id: user.id,
+      },
+      data: {
+        friends: {
+          disconnect: {
+            id: session.user.id,
           },
         },
       },
@@ -42,6 +58,6 @@ export async function acceptRequest(user: Session['user']) {
   revalidatePath(paths.userFriends());
 
   return {
-    success: 'Friend added successfuly!',
+    success: 'Friend removed successfuly!',
   };
 }
