@@ -7,7 +7,7 @@ export default async function UserLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="before:absolute before:inset-0 before:bg-slate-800 before:w-screen before:h-screen before:-z-10">
+    <div className="before:absolute before:inset-0 before:bg-slate-800 before:-z-10">
       {children}
       <NavBar />
     </div>

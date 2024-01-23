@@ -38,7 +38,7 @@ export default async function FriendsPage({ searchParams }: FriendsPageParams) {
           <RxCornerTopLeft className=" h-10 w-auto" />
           <RxCornerTopRight className=" h-10 w-auto justify-self-end" />
 
-          <div className="grid px-10 col-start-1 col-end-3 h-auto transition-all gap-y-7">
+          <div className="grid overflow-auto px-10 col-start-1 col-end-3 transition-all gap-y-7 scroll-smooth max-h-80 ">
             <Suspense fallback={'Loading...'}>
               <UserFriendsList searchParams={searchParams} />
             </Suspense>
