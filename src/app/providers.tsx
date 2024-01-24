@@ -17,7 +17,7 @@ type ProviderProps = {
 };
 
 export default function Providers({ children }: ProviderProps) {
-  /* redux-toolkey guide for next.js applications */
+  /* redux-toolkit guide for next.js applications */
   const storeRef = useRef<AppStore>();
 
   if (!storeRef.current) {

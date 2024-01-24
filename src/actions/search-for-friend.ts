@@ -7,5 +7,5 @@ export async function searchForFriend(value: string) {
   if (!value || typeof value !== 'string') {
     redirect(paths.userFriends());
   }
-  redirect(paths.userFriends(value));
+  redirect(paths.userFriends(value.trim().toLowerCase()));
 }

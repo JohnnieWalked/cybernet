@@ -1,11 +1,13 @@
 import { configureStore } from '@reduxjs/toolkit';
 
 import { userSlice } from './slices/userSlice';
+import { songSlice } from './slices/song';
 
 export const makeStore = () => {
   return configureStore({
     reducer: {
       userSlice: userSlice.reducer,
+      songSlice: songSlice.reducer,
     },
   });
 };

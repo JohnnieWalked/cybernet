@@ -43,7 +43,10 @@ export const paths = {
     return `/home/info`;
   },
 
-  music() {
+  music(song?: string) {
+    if (song) {
+      return `/home/music?term=${song}`;
+    }
     return `/home/music`;
   },
 };

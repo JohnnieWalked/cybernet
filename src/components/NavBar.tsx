@@ -3,6 +3,14 @@
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { paths } from '@/routes';
+import { useRef, useEffect } from 'react';
+
+/* components */
+import MusicNav from './music/MusicNav';
+
+/* redux-tk */
+import { useAppSelector, useAppDispatch } from '@/hooks/redux-typed-hooks';
+import { songSliceActions } from '@/store/slices/song';
 
 /* icons */
 import { FaHome, FaUserFriends } from 'react-icons/fa';
@@ -15,11 +23,33 @@ import {
 import { FaCircleInfo } from 'react-icons/fa6';
 
 export default function NavBar() {
+  const dispatch = useAppDispatch();
+  const songRef = useRef<HTMLAudioElement>(null);
+  const { song, volume, isPlaying } = useAppSelector(
+    (state) => state.songSlice
+  );
   const pathname = usePathname();
 
+  useEffect(() => {
+    if (!song) return;
+    if (!songRef.current) return;
+
+    songRef.current.volume = volume;
+
+    if (isPlaying) {
+      songRef.current.play();
+    } else {
+      songRef.current.pause();
+    }
+
+    dispatch(songSliceActions.setSongDuration(songRef.current.duration));
+  }, [dispatch, isPlaying, song, volume]);
+
   return (
-    <div className="menubar_wrapper fixed w-screen h-20 bg-neutral-900 bottom-0 text-white text-center z-10 grid place-items-center">
-      <div className="flex w-full h-full items-center justify-center gap-10">
+    <div
+      className={`menubar_wrapper fixed w-screen h-20 bg-neutral-900 bottom-0 text-white text-center z-10 grid transition-all place-items-center grid-cols-3`}
+    >
+      <section className="flex w-full h-full items-center justify-center gap-10 col-start-2 col-end-3">
         <Link
           className={`menubar-link ${
             pathname === '/home' ? 'active_menubar-link' : ''
@@ -73,7 +103,16 @@ export default function NavBar() {
         >
           <FaCircleInfo />
         </Link>
-      </div>
+      </section>
+
+      <section
+        className={`relative transition-all -bottom-[100%] ${
+          song && 'bottom-0'
+        }`}
+      >
+        <MusicNav />
+        <audio ref={songRef} src={song?.songUrl} />
+      </section>
     </div>
   );
 }
