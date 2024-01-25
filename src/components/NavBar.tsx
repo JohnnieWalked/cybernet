@@ -25,7 +25,7 @@ import { FaCircleInfo } from 'react-icons/fa6';
 export default function NavBar() {
   const dispatch = useAppDispatch();
   const songRef = useRef<HTMLAudioElement>(null);
-  const { song, volume, isPlaying } = useAppSelector(
+  const { song, volume, isPlaying, currentTime, moveTo } = useAppSelector(
     (state) => state.songSlice
   );
   const pathname = usePathname();
@@ -42,8 +42,12 @@ export default function NavBar() {
       songRef.current.pause();
     }
 
-    dispatch(songSliceActions.setSongDuration(songRef.current.duration));
-  }, [dispatch, isPlaying, song, volume]);
+    if (moveTo) {
+      dispatch(songSliceActions.moveTo(false));
+      songRef.current.currentTime = moveTo;
+      dispatch(songSliceActions.setCurrentTime(songRef.current.currentTime));
+    }
+  }, [currentTime, dispatch, isPlaying, moveTo, song, volume]);
 
   return (
     <div
@@ -105,14 +109,29 @@ export default function NavBar() {
         </Link>
       </section>
 
-      <section
-        className={`relative transition-all -bottom-[100%] ${
-          song && 'bottom-0'
-        }`}
-      >
-        <MusicNav />
-        <audio ref={songRef} src={song?.songUrl} />
-      </section>
+      {song && (
+        <section
+          className={`relative transition-all -bottom-[100%] ${
+            song && 'bottom-0'
+          }`}
+        >
+          <MusicNav />
+          <audio
+            onTimeUpdate={(e) =>
+              dispatch(
+                songSliceActions.setCurrentTime(e.currentTarget.currentTime)
+              )
+            }
+            onDurationChange={(e) =>
+              dispatch(
+                songSliceActions.setSongDuration(e.currentTarget.duration)
+              )
+            }
+            ref={songRef}
+            src={song.songUrl}
+          />
+        </section>
+      )}
     </div>
   );
 }

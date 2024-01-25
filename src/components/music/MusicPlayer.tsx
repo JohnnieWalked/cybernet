@@ -1,7 +1,7 @@
 'use client';
 
 /* hooks */
-import { useRef } from 'react';
+import { useRef, useEffect, useState } from 'react';
 
 /* next.js */
 import Image from 'next/image';
@@ -17,19 +17,30 @@ import { FaStopCircle } from 'react-icons/fa';
 import { FaPlayCircle } from 'react-icons/fa';
 import { IoPlaySkipBackCircle } from 'react-icons/io5';
 import { IoPlaySkipForwardCircle } from 'react-icons/io5';
+import { toHumanDuration } from '@/helpers/toHumanDuration';
 
 export default function MusicPlayer() {
   const dispatch = useAppDispatch();
-  const { song, isPlaying, duration } = useAppSelector(
+  const { song, isPlaying, totalDuration, currentTime } = useAppSelector(
     (state) => state.songSlice
   );
-  const sliderRef = useRef<HTMLDivElement>(null);
+  const [completedPathWidth, setCompletedPathWidth] = useState('0');
+  const sliderRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (!sliderRef.current || !song) {
+      return;
+    }
+    if (!isNaN(totalDuration)) {
+      const seekerPosition =
+        currentTime * (sliderRef.current.clientWidth / totalDuration);
+      sliderRef.current.max = sliderRef.current.clientWidth.toString();
+      sliderRef.current.value = seekerPosition.toString();
+      setCompletedPathWidth(sliderRef.current.value);
+    }
+  }, [currentTime, song, totalDuration]);
 
   if (!song) return;
-
-  const handleSongTimeSelection = () => {
-    console.log(duration);
-  };
 
   return (
     <div className=" flex flex-col w-full h-full gap-5 justify-center items-center text-white transition-all">
@@ -73,11 +84,29 @@ export default function MusicPlayer() {
       <div className="flex justify-center items-center gap-4 drop-shadow-[0px_5px_10px_rgb(0,0,0)]">
         <div className=" font-semibold">00:00</div>
         <div
-          ref={sliderRef}
-          onClick={handleSongTimeSelection}
-          className=" w-72 h-2 bg-white rounded cursor-pointer"
-        ></div>
-        <div className="font-semibold">{duration}</div>
+          className={`w-72 h-2 bg-white rounded relative transition-all z-0 `}
+        >
+          <input
+            onChange={(e) =>
+              dispatch(
+                songSliceActions.moveTo(
+                  totalDuration *
+                    (+e.currentTarget.value / e.currentTarget.clientWidth)
+                )
+              )
+            }
+            min={0}
+            type="range"
+            ref={sliderRef}
+            className={`mp3-slider appearance-none bg-none bg-transparent absolute w-full h-full cursor-pointer transition-all z-20 `}
+          />
+          <span
+            style={{ width: `${completedPathWidth}px` }}
+            className="absolute rounded h-full bg-cyan-400 pointer-events-none transition-all z-10"
+          ></span>
+        </div>
+
+        <div className="font-semibold">{toHumanDuration(totalDuration)}</div>
       </div>
     </div>
   );

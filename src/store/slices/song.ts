@@ -8,16 +8,18 @@ interface SongSlice {
   song: Music | null;
   volume: number;
   isPlaying: boolean;
-  duration: number;
-  slider: string;
+  totalDuration: number;
+  currentTime: number;
+  moveTo: false | number;
 }
 
 const initialState: SongSlice = {
   song: null,
-  volume: 1,
+  volume: 0.1,
   isPlaying: true,
-  duration: 0,
-  slider: '00:00',
+  totalDuration: 0,
+  currentTime: 0,
+  moveTo: false,
 };
 
 export const songSlice = createSlice({
@@ -31,7 +33,13 @@ export const songSlice = createSlice({
       state.isPlaying = action.payload;
     },
     setSongDuration: (state, action: PayloadAction<number>) => {
-      state.duration = action.payload;
+      state.totalDuration = action.payload;
+    },
+    setCurrentTime: (state, action: PayloadAction<number>) => {
+      state.currentTime = action.payload;
+    },
+    moveTo: (state, action: PayloadAction<number | false>) => {
+      state.moveTo = action.payload;
     },
   },
 });
