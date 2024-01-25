@@ -25,29 +25,39 @@ import { FaCircleInfo } from 'react-icons/fa6';
 export default function NavBar() {
   const dispatch = useAppDispatch();
   const songRef = useRef<HTMLAudioElement>(null);
-  const { song, volume, isPlaying, currentTime, moveTo } = useAppSelector(
-    (state) => state.songSlice
-  );
+  const { song, volume, isPlaying, currentTime, moveTo, nextSong } =
+    useAppSelector((state) => state.songSlice);
   const pathname = usePathname();
 
+  /* was seperated to another useEffect to avoid error in console (song changes => code was trying to play old song instead of new => play new song) */
   useEffect(() => {
     if (!song) return;
     if (!songRef.current) return;
-
-    songRef.current.volume = volume;
 
     if (isPlaying) {
       songRef.current.play();
     } else {
       songRef.current.pause();
     }
+  }, [isPlaying, song]);
+
+  /* was seperated to another useEffect to avoid volume-jump in the beggining of song (default volume value in <audio /> is 1) */
+  useEffect(() => {
+    if (!songRef.current) return;
+
+    songRef.current.volume = volume;
+  }, [song, volume]);
+
+  /* when user clicks on input-range => gets number of click-position in seconds => set current time to click-position in seconds  */
+  useEffect(() => {
+    if (!songRef.current) return;
 
     if (moveTo) {
       dispatch(songSliceActions.moveTo(false));
-      songRef.current.currentTime = moveTo;
       dispatch(songSliceActions.setCurrentTime(songRef.current.currentTime));
+      songRef.current.currentTime = moveTo;
     }
-  }, [currentTime, dispatch, isPlaying, moveTo, song, volume]);
+  }, [dispatch, moveTo]);
 
   return (
     <div
@@ -117,6 +127,10 @@ export default function NavBar() {
         >
           <MusicNav />
           <audio
+            onEnded={() => {
+              if (!nextSong) return;
+              dispatch(songSliceActions.currentPlayingSong(nextSong));
+            }}
             onTimeUpdate={(e) =>
               dispatch(
                 songSliceActions.setCurrentTime(e.currentTarget.currentTime)

@@ -4,8 +4,17 @@
     -webkit-appearance: none;
     width: 15px;
     height: 15px;
-    background-color: rgb(206, 206, 206);
-    filter: drop-shadow(0px 5px 10px black);
-    border-radius: 1000000000px;
+    background-color: rgb(189, 189, 189);
+    filter: drop-shadow(0px 5px 5px black);
+    border-radius: 100%;
+    transition: all 0.2s ease-in-out;
+    &:hover {
+      background-color: rgb(255, 255, 255);
+      transition: all 0.2s ease-in-out;
+    }
   }
+}
+
+.completedPath {
+  box-shadow: inset 0px 1px 1px black;
 }

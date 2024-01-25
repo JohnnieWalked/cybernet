@@ -3,6 +3,12 @@
 /* hooks */
 import { useRef, useEffect, useState } from 'react';
 
+/* helpers */
+import { toHumanDuration } from '@/helpers/toHumanDuration';
+
+/* types */
+import type { Music } from '@prisma/client';
+
 /* next.js */
 import Image from 'next/image';
 
@@ -10,25 +16,44 @@ import Image from 'next/image';
 import { useAppDispatch, useAppSelector } from '@/hooks/redux-typed-hooks';
 import { songSliceActions } from '@/store/slices/song';
 
-import { addZero } from '@/helpers/addZero';
-
 /* icons */
 import { FaStopCircle } from 'react-icons/fa';
 import { FaPlayCircle } from 'react-icons/fa';
 import { IoPlaySkipBackCircle } from 'react-icons/io5';
 import { IoPlaySkipForwardCircle } from 'react-icons/io5';
-import { toHumanDuration } from '@/helpers/toHumanDuration';
+import { FaVolumeHigh } from 'react-icons/fa6';
 
-export default function MusicPlayer() {
+type MusicPlayerProps = {
+  musicList: Music[];
+};
+
+export default function MusicPlayer({ musicList }: MusicPlayerProps) {
   const dispatch = useAppDispatch();
   const { song, isPlaying, totalDuration, currentTime } = useAppSelector(
     (state) => state.songSlice
   );
   const [completedPathWidth, setCompletedPathWidth] = useState('0');
+  const [currentSongIndex, setCurrentSongIndex] = useState<null | number>(null);
   const sliderRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    if (!sliderRef.current || !song) {
+    if (!song) return;
+    const nowPlayingSongindex = musicList.findIndex(
+      (item) => item.id === song.id
+    );
+    setCurrentSongIndex(nowPlayingSongindex);
+
+    if (currentSongIndex === musicList.length - 1) {
+      const selectNextSongUrl = musicList[0];
+      dispatch(songSliceActions.setNextSong(selectNextSongUrl));
+    } else {
+      const selectNextSongUrl = musicList[nowPlayingSongindex + 1];
+      dispatch(songSliceActions.setNextSong(selectNextSongUrl));
+    }
+  }, [currentSongIndex, dispatch, musicList, song]);
+
+  useEffect(() => {
+    if (!sliderRef.current) {
       return;
     }
     if (!isNaN(totalDuration)) {
@@ -38,12 +63,34 @@ export default function MusicPlayer() {
       sliderRef.current.value = seekerPosition.toString();
       setCompletedPathWidth(sliderRef.current.value);
     }
-  }, [currentTime, song, totalDuration]);
+  }, [currentTime, totalDuration]);
 
   if (!song) return;
 
+  const handlePreviousSong = () => {
+    if (currentSongIndex === null) return;
+    if (currentSongIndex === 0) {
+      const selectPreviousSong = musicList[musicList.length - 1];
+      dispatch(songSliceActions.currentPlayingSong(selectPreviousSong));
+    } else {
+      const selectPreviousSong = musicList[currentSongIndex - 1];
+      dispatch(songSliceActions.currentPlayingSong(selectPreviousSong));
+    }
+  };
+
+  const handleNextSong = () => {
+    if (currentSongIndex === null) return;
+    if (currentSongIndex === musicList.length - 1) {
+      const selectNextSong = musicList[0];
+      dispatch(songSliceActions.currentPlayingSong(selectNextSong));
+    } else {
+      const selectNextSong = musicList[currentSongIndex + 1];
+      dispatch(songSliceActions.currentPlayingSong(selectNextSong));
+    }
+  };
+
   return (
-    <div className=" flex flex-col w-full h-full gap-5 justify-center items-center text-white transition-all">
+    <section className=" flex flex-col w-full h-full gap-5 justify-center items-center text-white transition-all">
       <Image
         fill
         sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
@@ -51,12 +98,17 @@ export default function MusicPlayer() {
         src={song.imgUrl}
         alt="Song image"
       />
-      <section className="flex flex-col text-center drop-shadow-[0px_5px_10px_rgb(0,0,0)]">
+
+      <div className="flex flex-col text-center drop-shadow-[0px_5px_10px_rgb(0,0,0)]">
         <h2 className=" text-3xl font-bold">{song.name}</h2>
         <h3 className=" text-xl font-medium">{song.author}</h3>
-      </section>
-      <section className="flex gap-3 justify-center items-center drop-shadow-[0px_5px_10px_rgb(0,0,0)]">
-        <div className=" cursor-pointer w-12 h-12 hover:text-cyan-400">
+      </div>
+
+      <div className="flex gap-3 justify-center items-center drop-shadow-[0px_5px_10px_rgb(0,0,0)]">
+        <div
+          onClick={handlePreviousSong}
+          className=" cursor-pointer w-12 h-12 hover:text-cyan-400"
+        >
           <IoPlaySkipBackCircle className="w-full h-full transition" />
         </div>
 
@@ -76,15 +128,20 @@ export default function MusicPlayer() {
           </div>
         )}
 
-        <div className=" cursor-pointer w-12 h-12 hover:text-cyan-400">
+        <div
+          onClick={handleNextSong}
+          className=" cursor-pointer w-12 h-12 hover:text-cyan-400"
+        >
           <IoPlaySkipForwardCircle className="w-full h-full transition" />
         </div>
-      </section>{' '}
-      {/* control panel */}
+      </div>
+
       <div className="flex justify-center items-center gap-4 drop-shadow-[0px_5px_10px_rgb(0,0,0)]">
-        <div className=" font-semibold">00:00</div>
+        <div className=" w-12 font-semibold">
+          {toHumanDuration(currentTime)}
+        </div>
         <div
-          className={`w-72 h-2 bg-white rounded relative transition-all z-0 `}
+          className={`w-72 h-2 bg-slate-200 rounded relative transition-all z-0 `}
         >
           <input
             onChange={(e) =>
@@ -102,12 +159,17 @@ export default function MusicPlayer() {
           />
           <span
             style={{ width: `${completedPathWidth}px` }}
-            className="absolute rounded h-full bg-cyan-400 pointer-events-none transition-all z-10"
+            className=" completedPath absolute rounded h-full bg-cyan-400 hover:brightness-125 pointer-events-none transition-all z-10"
           ></span>
         </div>
 
         <div className="font-semibold">{toHumanDuration(totalDuration)}</div>
       </div>
-    </div>
+
+      <div className="flex gap-4">
+        <FaVolumeHigh className=" w-6 h-6" />
+        <input type="range" defaultValue={50} min={0} max={100} />
+      </div>
+    </section>
   );
 }

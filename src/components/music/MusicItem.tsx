@@ -1,5 +1,6 @@
 'use client';
 
+import musicGif from '/public/imgs/gif_music.gif';
 import Image from 'next/image';
 import type { Music } from '@prisma/client';
 import { useCallback } from 'react';
@@ -13,6 +14,7 @@ type MusicItemProps = {
 
 export default function MusicItem({ song }: MusicItemProps) {
   const dispatch = useAppDispatch();
+  const currentSong = useAppSelector((state) => state.songSlice);
 
   const handleClick = useCallback(() => {
     dispatch(songSliceActions.currentPlayingSong(song));
@@ -31,10 +33,31 @@ export default function MusicItem({ song }: MusicItemProps) {
           src={song.imgUrl}
           alt="Song image"
         />
+        {currentSong.song?.id === song.id && (
+          <Image
+            className=" absolute top-0 left-0 w-full h-full object-cover opacity-70 rounded-full"
+            src={musicGif}
+            alt="GIF Equalizer"
+          />
+        )}
       </div>
       <div className="flex h-full flex-col justify-center items-start text-white break-words">
-        <div className=" font-bold text-yellow-400">{song.name}</div>
-        <div className=" font-light">{song.author}</div>
+        <div
+          className={`font-bold ${
+            currentSong.song?.id === song.id
+              ? 'text-cyan-400'
+              : 'text-yellow-400'
+          } `}
+        >
+          {song.name}
+        </div>
+        <div
+          className={`font-light ${
+            currentSong.song?.id === song.id && 'text-cyan-400'
+          }`}
+        >
+          {song.author}
+        </div>
       </div>
     </div>
   );
