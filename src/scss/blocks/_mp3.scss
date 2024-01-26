@@ -1,16 +1,47 @@
-.mp3-slider {
-  -webkit-appearance: none;
-  &::-webkit-slider-thumb {
+.mp3 {
+  &-slider {
     -webkit-appearance: none;
-    width: 15px;
-    height: 15px;
-    background-color: rgb(189, 189, 189);
-    filter: drop-shadow(0px 5px 5px black);
-    border-radius: 100%;
-    transition: all 0.2s ease-in-out;
-    &:hover {
-      background-color: rgb(255, 255, 255);
+    &::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 15px;
+      height: 15px;
+      background-color: rgb(189, 189, 189);
+      filter: drop-shadow(0px 5px 5px black);
+      border-radius: 100%;
       transition: all 0.2s ease-in-out;
+      &:hover {
+        background-color: rgb(255, 255, 255);
+        transition: all 0.2s ease-in-out;
+      }
+    }
+  }
+  &-volume {
+    position: relative;
+    -webkit-appearance: none;
+    background: transparent;
+    &::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 15px;
+      height: 15px;
+      background-color: rgb(189, 189, 189);
+      filter: drop-shadow(0px 5px 5px black);
+      border-radius: 100%;
+      transition: all 0.2s ease-in-out;
+      &:hover {
+        background-color: rgb(255, 255, 255);
+        transition: all 0.2s ease-in-out;
+      }
+    }
+    &::before {
+      content: '';
+      position: absolute;
+      width: 100%;
+      height: 30%;
+      left: 0;
+      top: 50%;
+      translate: 0 -50%;
+      background-color: white;
+      border-radius: 10px;
     }
   }
 }

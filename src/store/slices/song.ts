@@ -15,7 +15,7 @@ interface SongSlice {
 
 const initialState: SongSlice = {
   song: null,
-  volume: 0.1,
+  volume: 0.5,
   isPlaying: true,
   totalDuration: 0,
   currentTime: 0,
@@ -44,6 +44,9 @@ export const songSlice = createSlice({
     },
     setNextSong: (state, action: PayloadAction<Music>) => {
       state.nextSong = action.payload;
+    },
+    changeVolume: (state, action: PayloadAction<number>) => {
+      state.volume = action.payload;
     },
   },
 });

@@ -168,7 +168,18 @@ export default function MusicPlayer({ musicList }: MusicPlayerProps) {
 
       <div className="flex gap-4">
         <FaVolumeHigh className=" w-6 h-6" />
-        <input type="range" defaultValue={50} min={0} max={100} />
+        <input
+          onChange={(e) => {
+            dispatch(
+              songSliceActions.changeVolume(+e.currentTarget.value / 100)
+            );
+          }}
+          className="mp3-volume"
+          type="range"
+          defaultValue={50}
+          min={0}
+          max={100}
+        />
       </div>
     </section>
   );

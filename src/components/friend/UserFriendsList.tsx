@@ -74,18 +74,52 @@ export default async function UserFriendsList({
 
       return <>{renderFindNewFriend}</>;
     } else {
-      const renderedFriendsList = friends
-        .concat(friendsAddedMe)
-        .map((friend) => {
+      const awaitingApprovalFriends = friendsStatus.awaitingApprovalFriends.map(
+        (friend, index) => {
           if (
-            friend.name.toLowerCase().includes(term) ||
+            friend.name!.toLowerCase().includes(term) ||
             friend.username.toLowerCase().includes(term)
           ) {
-            return <FriendListItem key={friend.username} user={friend} />;
+            return (
+              <FriendListItem key={index} user={friend} acceptFriendRequest />
+            );
           }
-        });
+        }
+      );
 
-      return <>{renderedFriendsList}</>;
+      const friends = friendsStatus.friendsAlready.map((friend, index) => {
+        if (
+          friend.name!.toLowerCase().includes(term) ||
+          friend.username.toLowerCase().includes(term)
+        ) {
+          return <FriendListItem key={index} user={friend} friendAlready />;
+        }
+      });
+
+      const sendRequestTo = friendsStatus.requestSendFriends.map(
+        (friend, index) => {
+          if (
+            friend.name!.toLowerCase().includes(term) ||
+            friend.username.toLowerCase().includes(term)
+          ) {
+            return (
+              <FriendListItem
+                key={index}
+                user={friend}
+                friendYouSentRequestTo
+              />
+            );
+          }
+        }
+      );
+
+      return (
+        <>
+          {awaitingApprovalFriends}
+          {friends}
+          {sendRequestTo}
+        </>
+      );
     }
   }
 }
