@@ -1,6 +1,6 @@
 # CYBERNET
 
-**"CyberNet"** is a custom web messenger app developed with Next.js  and Auth.js in "*Cyberpunk 2077*" style.
+**"CyberNet"** is a custom web social app developed with Next.js and Auth.js in "*Cyberpunk 2077*" style.
 
 ---
 
@@ -13,6 +13,7 @@
 - React library;
 - Postgresql (DB located on website "Supabase");
 - ORM Prisma;
+- nodemailer;
 - auth/prisma-adapter;
 - bcryptjs;
 - uuid;
@@ -179,3 +180,58 @@ So, to be more precise, let's imagine two users: *Johnny* and *Panam*.
 ![Friend list functionality](<Friends func.gif>)
 
 ---
+
+### MP3 Player Functionality
+
+Information about `<audio />` and song we are going to store in RTK.
+
+```TypeScript
+interface SongSlice {
+  song: Music | null;
+  volume: number;
+  isPlaying: boolean;
+  totalDuration: number;
+  currentTime: number;
+  moveTo: false | number;
+  playlistLength: number | null;
+}
+
+const initialState: SongSlice = {
+  song: null,
+  volume: 0.5,
+  isPlaying: true,
+  totalDuration: 0,
+  currentTime: 0,
+  moveTo: false,
+  playlistLength: null,
+};
+```
+
+To play songs anywhere in the app, `<audio />` will be rendered in `NavBar.tsx - (client component that is visible on any page (except login page))`.
+
+```jsx
+<audio
+  onEnded={handleSongEnded}
+  onTimeUpdate={(e) =>
+    dispatch(
+      songSliceActions.setCurrentTime(e.currentTarget.currentTime)
+    )
+  }
+  onDurationChange={(e) =>
+    dispatch(
+      songSliceActions.setSongDuration(e.currentTarget.duration)
+    )
+  }
+  ref={songRef}
+  src={song.songUrl}
+/>
+```
+
+- `onTimeUpdate` is responsible for updating current time of the song in RTK (songSlice).
+- `onDurationChange` is responsible for getting song total duration and dispatching in RTK (songSlice).
+
+Using these event handlers (`onTimeUpdate` and `onDurationChange`) we are going to move our seeker and change time in MP3-player.
+
+- `onEnded` is responsible for fetching new song from DB using current song id.
+
+MP3-player by itself is located on Music Page.

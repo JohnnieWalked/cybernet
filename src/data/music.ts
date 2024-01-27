@@ -12,3 +12,18 @@ export async function getAllMusic() {
     return null;
   }
 }
+
+export async function getNextSong(id: number) {
+  try {
+    const song = await db.music.findFirst({
+      where: { id },
+    });
+
+    return song;
+  } catch (error) {
+    if (error instanceof Error) {
+      console.log(error.message);
+    }
+    return null;
+  }
+}

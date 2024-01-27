@@ -7,3 +7,4 @@ export { acceptRequest } from './accept-request';
 export { sendRequest } from './send-request';
 export { removeFriend } from './remove-friend';
 export { searchForMusic } from './search-for-music';
+export { getNextSong } from './get-next-song';

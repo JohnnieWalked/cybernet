@@ -4,6 +4,7 @@ import { usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { paths } from '@/routes';
 import { useRef, useEffect } from 'react';
+import * as actions from '@/actions';
 
 /* components */
 import MusicNav from './music/MusicNav';
@@ -25,8 +26,9 @@ import { FaCircleInfo } from 'react-icons/fa6';
 export default function NavBar() {
   const dispatch = useAppDispatch();
   const songRef = useRef<HTMLAudioElement>(null);
-  const { song, volume, isPlaying, currentTime, moveTo, nextSong } =
-    useAppSelector((state) => state.songSlice);
+  const { song, volume, isPlaying, moveTo, playlistLength } = useAppSelector(
+    (state) => state.songSlice
+  );
   const pathname = usePathname();
 
   /* was seperated to another useEffect to avoid error in console (song changes => code was trying to play old song instead of new => play new song) */
@@ -58,6 +60,14 @@ export default function NavBar() {
       songRef.current.currentTime = moveTo;
     }
   }, [dispatch, moveTo]);
+
+  const handleSongEnded = () => {
+    if (!playlistLength || !song) return;
+    const nextSong = actions.getNextSong.bind(null, song.id, playlistLength);
+    nextSong().then(
+      (data) => data && dispatch(songSliceActions.currentPlayingSong(data))
+    );
+  };
 
   return (
     <div
@@ -127,10 +137,7 @@ export default function NavBar() {
         >
           <MusicNav />
           <audio
-            onEnded={() => {
-              if (!nextSong) return;
-              dispatch(songSliceActions.currentPlayingSong(nextSong));
-            }}
+            onEnded={handleSongEnded}
             onTimeUpdate={(e) =>
               dispatch(
                 songSliceActions.setCurrentTime(e.currentTarget.currentTime)

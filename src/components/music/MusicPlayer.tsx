@@ -29,29 +29,27 @@ type MusicPlayerProps = {
 
 export default function MusicPlayer({ musicList }: MusicPlayerProps) {
   const dispatch = useAppDispatch();
-  const { song, isPlaying, totalDuration, currentTime } = useAppSelector(
-    (state) => state.songSlice
-  );
+  const { song, isPlaying, totalDuration, currentTime, volume } =
+    useAppSelector((state) => state.songSlice);
   const [completedPathWidth, setCompletedPathWidth] = useState('0');
   const [currentSongIndex, setCurrentSongIndex] = useState<null | number>(null);
   const sliderRef = useRef<HTMLInputElement>(null);
 
+  /* get musicList length and pass to RTK */
+  useEffect(() => {
+    dispatch(songSliceActions.setPlaylistLength(musicList.length));
+  }, [dispatch, musicList.length]);
+
+  /* set index of current song in component state. Reason => handle next and previous song buttons */
   useEffect(() => {
     if (!song) return;
     const nowPlayingSongindex = musicList.findIndex(
       (item) => item.id === song.id
     );
     setCurrentSongIndex(nowPlayingSongindex);
+  }, [dispatch, musicList, song]);
 
-    if (currentSongIndex === musicList.length - 1) {
-      const selectNextSongUrl = musicList[0];
-      dispatch(songSliceActions.setNextSong(selectNextSongUrl));
-    } else {
-      const selectNextSongUrl = musicList[nowPlayingSongindex + 1];
-      dispatch(songSliceActions.setNextSong(selectNextSongUrl));
-    }
-  }, [currentSongIndex, dispatch, musicList, song]);
-
+  /* update seeker and path behing it in cyan color (represents completed path) */
   useEffect(() => {
     if (!sliderRef.current) {
       return;
@@ -176,7 +174,7 @@ export default function MusicPlayer({ musicList }: MusicPlayerProps) {
           }}
           className="mp3-volume"
           type="range"
-          defaultValue={50}
+          defaultValue={volume * 100}
           min={0}
           max={100}
         />

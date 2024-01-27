@@ -10,7 +10,7 @@ interface SongSlice {
   totalDuration: number;
   currentTime: number;
   moveTo: false | number;
-  nextSong: Music | null;
+  playlistLength: number | null;
 }
 
 const initialState: SongSlice = {
@@ -20,7 +20,7 @@ const initialState: SongSlice = {
   totalDuration: 0,
   currentTime: 0,
   moveTo: false,
-  nextSong: null,
+  playlistLength: null,
 };
 
 export const songSlice = createSlice({
@@ -42,11 +42,11 @@ export const songSlice = createSlice({
     moveTo: (state, action: PayloadAction<number | false>) => {
       state.moveTo = action.payload;
     },
-    setNextSong: (state, action: PayloadAction<Music>) => {
-      state.nextSong = action.payload;
-    },
     changeVolume: (state, action: PayloadAction<number>) => {
       state.volume = action.payload;
+    },
+    setPlaylistLength: (state, action: PayloadAction<number>) => {
+      state.playlistLength = action.payload;
     },
   },
 });
