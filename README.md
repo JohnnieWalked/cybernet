@@ -235,3 +235,7 @@ Using these event handlers (`onTimeUpdate` and `onDurationChange`) we are going 
 - `onEnded` is responsible for fetching new song from DB using current song id.
 
 MP3-player by itself is located on Music Page.
+
+![Music Page](image-1.png)
+
+Playlist does not have huge size, so we will get full `playlist.length` after opening Music page. Song id in DB has type Int (Number) with autoincrement '+1'. So after end of the song we will fetch `current song.id + 1`. If `song.id === playlist.length` => fetch song with id '**1**'.
