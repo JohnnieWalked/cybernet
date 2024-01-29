@@ -54,13 +54,22 @@ export default function MusicPlayer({ musicList }: MusicPlayerProps) {
     if (!sliderRef.current) {
       return;
     }
+    /* to avoid crash app after scroll all song using seeker */
+    const interval = setInterval(() => {
+      if (!sliderRef.current) return;
+      setCompletedPathWidth(sliderRef.current.value);
+    }, 100);
+
     if (!isNaN(totalDuration)) {
       const seekerPosition =
         currentTime * (sliderRef.current.clientWidth / totalDuration);
       sliderRef.current.max = sliderRef.current.clientWidth.toString();
       sliderRef.current.value = seekerPosition.toString();
-      setCompletedPathWidth(sliderRef.current.value);
     }
+
+    return () => {
+      clearInterval(interval);
+    };
   }, [currentTime, totalDuration]);
 
   if (!song) return;
