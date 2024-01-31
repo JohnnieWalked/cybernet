@@ -20,6 +20,8 @@ model User {
   image          String?
   friends        User[]    @relation("friends")
   friendsAddedMe User[]    @relation("friends")
+  Posts          Post[]
+  Comment        Comment[]
 }
 
 model Music {
@@ -37,4 +39,29 @@ model VerificationToken {
   expires DateTime
 
   @@unique([email, token]) // unique token per email
+}
+
+model Post {
+  id        String   @id @default(cuid())
+  title     String
+  content   String
+  authorId  String
+  published DateTime @default(now())
+
+  author  User      @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  Comment Comment[]
+}
+
+model Comment {
+  id        String   @id @default(cuid())
+  content   String
+  createdAt DateTime @default(now())
+  postId    String
+  userId    String
+  parentId  String?
+
+  parent   Comment?  @relation("comments", fields: [parentId], references: [id], onDelete: Cascade)
+  post     Post      @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  children Comment[] @relation("comments")
 }

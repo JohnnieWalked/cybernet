@@ -31,8 +31,8 @@ export const paths = {
     return `/home/friends`;
   },
 
-  userMail() {
-    return `/home/mail`;
+  userPosts() {
+    return `/home/posts`;
   },
 
   userSettings() {

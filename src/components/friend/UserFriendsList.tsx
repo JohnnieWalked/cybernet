@@ -1,63 +1,72 @@
-import { auth } from '@/auth';
-import { getUserFriendsAndRelationsById, getUserByUsername } from '@/data/user';
-import { checkRelationShipStatus } from '@/helpers/checkRelationShipStatus';
+import type { User } from 'next-auth';
+import type { Session } from 'next-auth/types';
+
+/* data */
+import { getUserByUsername } from '@/data/user';
 
 /* components */
-import Loader from '../common/Loader';
 import FriendListItem from './FriendListItem';
 
-interface FriendsSearchParams {
-  searchParams: {
-    term: string;
+interface FriendsSearchProps {
+  friendsStatus: {
+    friendsAlready: Session['user'][];
+    requestSendFriends: Session['user'][];
+    awaitingApprovalFriends: Session['user'][];
   };
+  term?: string;
+  sessionUserName?: string;
+  showFriends?: boolean;
+  showFriendsYouSendRequestTo?: boolean;
+  showFriendsAwaitingApproval?: boolean;
 }
 
 export default async function UserFriendsList({
-  searchParams,
-}: FriendsSearchParams) {
-  const session = await auth();
-  const { term } = searchParams;
-
-  if (!session) return <Loader width="100%" color="var(--redLight)" />;
-
-  const user = await getUserFriendsAndRelationsById(session.user.id);
-  if (!user) return <div>Oops, nothing here...</div>;
-  const { friends, friendsAddedMe } = user;
-  const friendsStatus = checkRelationShipStatus(friends, friendsAddedMe);
-
-  /** Users, that are already your friends. */
-  const friendsAlready = friendsStatus.friendsAlready.map((user) => (
-    <FriendListItem key={user.username} user={user} friendAlready />
-  ));
-
-  /** Users, whom You sent request. */
-  const friendsYouSentRequestTo = friendsStatus.requestSendFriends.map(
-    (user) => (
-      <FriendListItem key={user.username} user={user} friendYouSentRequestTo />
-    )
-  );
-
+  friendsStatus,
+  term,
+  sessionUserName,
+  showFriends,
+  showFriendsAwaitingApproval,
+  showFriendsYouSendRequestTo,
+}: FriendsSearchProps) {
   /** Users, that are awaiting your approval. */
-  const friendsAwaitingApproval = friendsStatus.awaitingApprovalFriends.map(
-    (user) => (
-      <FriendListItem key={user.username} user={user} acceptFriendRequest />
-    )
-  );
-
-  /* if search term in URL is empty => render all friends */
-  if (!term) {
-    return (
-      <>
-        {friendsAwaitingApproval}
-        {friendsAlready}
-        {friendsYouSentRequestTo}
-      </>
+  if (showFriendsAwaitingApproval) {
+    const friendsAwaitingApproval = friendsStatus.awaitingApprovalFriends.map(
+      (user) => (
+        <FriendListItem key={user.username} user={user} acceptFriendRequest />
+      )
     );
+
+    return <>{friendsAwaitingApproval}</>;
   }
 
+  /** Users, that are already your friends. */
+  if (showFriends) {
+    const friendsAlready = friendsStatus.friendsAlready.map((user) => (
+      <FriendListItem key={user.username} user={user} friendAlready />
+    ));
+
+    return <>{friendsAlready}</>;
+  }
+
+  /** Users, whom You sent request. */
+  if (showFriendsYouSendRequestTo) {
+    const friendsYouSentRequestTo = friendsStatus.requestSendFriends.map(
+      (user) => (
+        <FriendListItem
+          key={user.username}
+          user={user}
+          friendYouSentRequestTo
+        />
+      )
+    );
+
+    return <>{friendsYouSentRequestTo}</>;
+  }
+
+  /** Show new user. */
   if (term) {
     if (term.startsWith('@')) {
-      if (term.substring(1).toLowerCase() === session.user.username)
+      if (term.substring(1).toLowerCase() === sessionUserName)
         return <div>Oops, nothing here...</div>;
 
       const findNewFriend = await getUserByUsername(term.substring(1));
@@ -74,6 +83,7 @@ export default async function UserFriendsList({
 
       return <>{renderFindNewFriend}</>;
     } else {
+    /** Show filtered friends. */
       const awaitingApprovalFriends = friendsStatus.awaitingApprovalFriends.map(
         (friend, index) => {
           if (

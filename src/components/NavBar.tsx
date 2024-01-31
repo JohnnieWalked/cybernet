@@ -85,7 +85,7 @@ export default function NavBar() {
 
         <Link
           className={`menubar-link ${
-            pathname.includes('/friends') ? 'active_menubar-link' : ''
+            pathname.includes(paths.userFriends()) ? 'active_menubar-link' : ''
           }`}
           href={paths.userFriends()}
         >
@@ -94,16 +94,20 @@ export default function NavBar() {
 
         <Link
           className={`menubar-link ${
-            pathname.includes('/mail') ? 'active_menubar-link' : ''
+            pathname.includes(paths.userPosts()) ? 'active_menubar-link' : ''
           }`}
-          href={paths.userMail()}
+          href={paths.userPosts()}
         >
-          {pathname.includes('/mail') ? <IoIosMailOpen /> : <IoMdMail />}
+          {pathname.includes(paths.userPosts()) ? (
+            <IoIosMailOpen />
+          ) : (
+            <IoMdMail />
+          )}
         </Link>
 
         <Link
           className={`menubar-link ${
-            pathname.includes('/settings') ? 'active_menubar-link' : ''
+            pathname.includes(paths.userSettings()) ? 'active_menubar-link' : ''
           }`}
           href={paths.userSettings()}
         >
@@ -112,7 +116,7 @@ export default function NavBar() {
 
         <Link
           className={`menubar-link ${
-            pathname.includes('/music') ? 'active_menubar-link' : ''
+            pathname.includes(paths.music()) ? 'active_menubar-link' : ''
           }`}
           href={paths.music()}
         >
@@ -121,7 +125,7 @@ export default function NavBar() {
 
         <Link
           className={`menubar-link ${
-            pathname.includes('/info') ? 'active_menubar-link' : ''
+            pathname.includes(paths.info()) ? 'active_menubar-link' : ''
           }`}
           href={paths.info()}
         >

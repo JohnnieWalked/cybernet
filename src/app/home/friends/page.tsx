@@ -1,9 +1,19 @@
 import { Suspense } from 'react';
 
+/* auth */
+import { auth } from '@/auth';
+
+/* helpers */
+import { checkRelationShipStatus } from '@/helpers/checkRelationShipStatus';
+
+/* data */
+import { getUserFriendsAndRelationsById } from '@/data/user';
+
 /* components */
 import Title from '@/components/common/Title';
 import SearchInput from '@/components/common/SearchInput';
 import UserFriendsList from '@/components/friend/UserFriendsList';
+import Loader from '@/components/common/Loader';
 
 /* icons */
 import {
@@ -20,6 +30,17 @@ interface FriendsPageParams {
 }
 
 export default async function FriendsPage({ searchParams }: FriendsPageParams) {
+  const session = await auth();
+  const { term } = searchParams;
+
+  if (!session) return <Loader width="100%" color="var(--redLight)" />;
+
+  const user = await getUserFriendsAndRelationsById(session.user.id);
+  if (!user) return <div>Oops, nothing here...</div>;
+
+  const { friends, friendsAddedMe } = user;
+  const friendsStatus = checkRelationShipStatus(friends, friendsAddedMe);
+
   return (
     <div className="flex flex-col justify-center items-center gap-20 transition-all">
       <Title>My Friends</Title>
@@ -40,7 +61,27 @@ export default async function FriendsPage({ searchParams }: FriendsPageParams) {
 
           <div className="grid overflow-auto px-10 col-start-1 col-end-3 transition-all gap-y-7 scroll-smooth max-h-80 ">
             <Suspense fallback={'Loading...'}>
-              <UserFriendsList searchParams={searchParams} />
+              {term ? (
+                <>
+                  <UserFriendsList
+                    term={term}
+                    friendsStatus={friendsStatus}
+                    sessionUserName={session.user.name!}
+                  />
+                </>
+              ) : (
+                <>
+                  <UserFriendsList
+                    friendsStatus={friendsStatus}
+                    showFriendsAwaitingApproval
+                  />
+                  <UserFriendsList friendsStatus={friendsStatus} showFriends />
+                  <UserFriendsList
+                    friendsStatus={friendsStatus}
+                    showFriendsYouSendRequestTo
+                  />
+                </>
+              )}
             </Suspense>
           </div>
 
