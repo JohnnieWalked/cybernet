@@ -1,4 +1,5 @@
 @import './helpers';
+@import './mixins';
 @import './cyberpunkButton';
 @import './animation';
 @import './react-transition-group';
@@ -6,7 +7,35 @@
 @import './blocks/menubar';
 @import './blocks/musiclist';
 @import './blocks/mp3';
+@import './blocks/posts';
 
 * {
   box-sizing: border-box;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  background-color: #4d4d4d;
+}
+
+::-webkit-scrollbar-track {
+  box-shadow: inset 0 0 5px #000000;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #a0a0a0;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: rgb(161 161 170);
+  border-radius: 5px;
+  border: 2px solid #4d4d4d;
+}
+
+::-webkit-scrollbar-button {
+  display: none;
+}
+
+::-webkit-scrollbar-thumb:vertical {
+  height: 30px;
 }

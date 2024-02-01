@@ -1,4 +1,3 @@
-import type { User } from 'next-auth';
 import type { Session } from 'next-auth/types';
 
 /* data */
@@ -83,7 +82,7 @@ export default async function UserFriendsList({
 
       return <>{renderFindNewFriend}</>;
     } else {
-    /** Show filtered friends. */
+      /** Show filtered friends. */
       const awaitingApprovalFriends = friendsStatus.awaitingApprovalFriends.map(
         (friend, index) => {
           if (

@@ -46,7 +46,8 @@ model Post {
   title     String
   content   String
   authorId  String
-  published DateTime @default(now())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   author  User      @relation(fields: [authorId], references: [id], onDelete: Cascade)
   Comment Comment[]
@@ -56,6 +57,7 @@ model Comment {
   id        String   @id @default(cuid())
   content   String
   createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
   postId    String
   userId    String
   parentId  String?

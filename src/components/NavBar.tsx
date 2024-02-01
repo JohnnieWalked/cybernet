@@ -76,7 +76,7 @@ export default function NavBar() {
       <section className="flex w-full h-full items-center justify-center gap-10 col-start-2 col-end-3">
         <Link
           className={`menubar-link ${
-            pathname === '/home' ? 'active_menubar-link' : ''
+            pathname === paths.userHomePage() ? 'active_menubar-link' : ''
           }`}
           href={paths.loginPage()}
         >

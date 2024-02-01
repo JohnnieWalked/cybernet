@@ -1,0 +1,17 @@
+.postsFriendList {
+  @include shadow-list;
+  &::after {
+    border-radius: 20px;
+  }
+  &::before {
+    border-radius: 20px;
+  }
+}
+
+.post-btn {
+  // font-family: inherit;
+  font-size: 18px;
+  min-width: 100%;
+  height: auto;
+  line-height: 50px;
+}

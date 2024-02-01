@@ -1,0 +1,29 @@
+@mixin shadow-list {
+  padding: 20px;
+  position: relative;
+
+  &::before {
+    content: '';
+    height: 100%;
+    position: absolute;
+    width: 100%;
+    border-right: 3px solid #aefff9;
+    left: 0;
+    top: 0;
+    pointer-events: none;
+    z-index: -1;
+  }
+
+  &::after {
+    content: '';
+    height: 100%;
+    position: absolute;
+    width: 100%;
+    left: 0;
+    top: 0;
+    box-shadow: inset 0 200px 45px -165px rgb(19, 26, 37),
+      inset 0 -200px 45px -165px rgb(19, 26, 37);
+    pointer-events: none;
+    z-index: 4;
+  }
+}

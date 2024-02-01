@@ -6,8 +6,10 @@ import type { Session } from 'next-auth/types';
 /* components */
 import UserAvatar from '../user/UserAvatar';
 
+import { usePathname } from 'next/navigation';
 import { toast } from 'react-toastify';
 import * as actions from '@/actions';
+import { paths } from '@/routes';
 
 type FriendListItemProps = {
   user: Session['user'];
@@ -24,6 +26,7 @@ export default function FriendListItem({
   friendYouSentRequestTo,
   isNewFriend,
 }: FriendListItemProps) {
+  const pathname = usePathname();
   const handleSendRequest = () => {
     actions
       .sendRequest(user)
@@ -70,7 +73,7 @@ export default function FriendListItem({
   };
 
   const renderFriendStatus = () => {
-    if (friendAlready) {
+    if (friendAlready && pathname.includes(paths.userFriends())) {
       return (
         <form
           action={handleRemoveFriend}
