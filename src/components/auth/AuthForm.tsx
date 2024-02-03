@@ -50,7 +50,7 @@ export default function AuthForm() {
           name="password"
           label="Password"
         />
-        <FormButtonPrimary>Sign in</FormButtonPrimary>
+        <FormButtonPrimary type="submit">Sign in</FormButtonPrimary>
       </form>
       <div className="flex mt-10 justify-center items-center text-lg">
         <button
@@ -104,7 +104,7 @@ export default function AuthForm() {
           </div>
         ) : null}
 
-        <FormButtonPrimary>Sign Up</FormButtonPrimary>
+        <FormButtonPrimary type="submit">Sign Up</FormButtonPrimary>
       </form>
       <div className="flex mt-10 justify-center items-center text-lg">
         <button

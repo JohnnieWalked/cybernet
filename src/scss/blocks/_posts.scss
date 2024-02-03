@@ -15,3 +15,58 @@
   height: auto;
   line-height: 50px;
 }
+
+.post_dialog {
+  width: 100%;
+  height: 100%;
+  padding: 60px;
+  position: relative;
+  background: transparent;
+  &-btn {
+    // font-size: 18px;
+    width: 320px;
+    // height: auto;
+    // line-height: 50px;
+  }
+  &::before {
+    content: ' ';
+    display: block;
+    top: 0px;
+    left: 0px;
+    width: 100%;
+    height: 100px;
+    background-color: var(--yellow);
+    position: absolute;
+    clip-path: polygon(
+      calc(22% + 28px) -1px,
+      calc(22% + 45px) 15px,
+      34% 15px,
+      calc(34% + 15px) -1px,
+      70% 0px
+    );
+  }
+  &::after {
+    content: ' ';
+    display: block;
+    bottom: 0px;
+    left: 0px;
+    width: 100%;
+    height: 30px;
+    background-color: var(--yellow);
+    position: absolute;
+    clip-path: polygon(
+      0% 0%,
+      22% 0%,
+      calc(22% + 30px) 30px,
+      52% 30px,
+      calc(52% + 15px) 15px,
+      70% 15px,
+      calc(70% + 15px) 30px,
+      90% 30px,
+      calc(90% + 30px) 0px,
+      100% 0px,
+      100% 30px,
+      0px 30px
+    );
+  }
+}

@@ -8,3 +8,5 @@ export { sendRequest } from './send-request';
 export { removeFriend } from './remove-friend';
 export { searchForMusic } from './search-for-music';
 export { getNextSong } from './get-next-song';
+export { createPost } from './create-post';
+export { filterFriendsPosts } from './filter-friends-posts';

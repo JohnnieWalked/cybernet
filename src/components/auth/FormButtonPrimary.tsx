@@ -6,18 +6,23 @@ import { BarLoader } from 'react-spinners';
 type FormButtonProps = {
   children: React.ReactNode;
   className?: string;
+  onClick?: () => void;
+  type: 'submit' | 'button';
 };
 
 export default function FormButtonPrimary({
+  type,
   children,
+  onClick,
   className,
 }: FormButtonProps) {
   const { pending } = useFormStatus();
 
   return (
     <button
+      onClick={onClick}
       disabled={pending}
-      type="submit"
+      type={type}
       className={`flex items-center justify-center cybr-btn bg-cyan-600 ${className}`}
     >
       {pending ? (

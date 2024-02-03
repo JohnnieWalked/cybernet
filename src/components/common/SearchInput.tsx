@@ -11,7 +11,13 @@ import Input from './Input';
 /* actions */
 import * as actions from '@/actions';
 
-function SearchInput() {
+type SearchInputProps = {
+  name: string;
+  label: string;
+  searchParamsKey: string;
+};
+
+function SearchInput({ name, label, searchParamsKey }: SearchInputProps) {
   const [inputValue, setInputValue] = useState<string | undefined>();
   const searchParams = useSearchParams();
   const pathname = usePathname();
@@ -22,19 +28,21 @@ function SearchInput() {
     if (pathname.includes(paths.userFriends())) {
       actions.searchForFriend.bind(null, inputValue)();
     }
-
     if (pathname.includes(paths.music())) {
       actions.searchForMusic.bind(null, inputValue)();
+    }
+    if (pathname.includes(paths.userPosts())) {
+      actions.filterFriendsPosts.bind(null, inputValue)();
     }
   }, [inputValue, pathname]);
 
   return (
     <Input
       passValueToParent={setInputValue}
-      defaultValue={searchParams.get('term') || ''}
+      defaultValue={searchParams.get(searchParamsKey) || ''}
       classWrapper="mb-3 text-white"
-      name="search"
-      label="Search..."
+      name={name}
+      label={label}
       type="text"
     />
   );

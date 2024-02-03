@@ -22,16 +22,17 @@ import {
   RxCornerTopLeft,
   RxCornerTopRight,
 } from 'react-icons/rx';
+import NewFriend from '@/components/friend/NewFriend';
 
 interface FriendsPageParams {
   searchParams: {
-    term: string;
+    friend: string;
   };
 }
 
 export default async function FriendsPage({ searchParams }: FriendsPageParams) {
   const session = await auth();
-  const { term } = searchParams;
+  const { friend } = searchParams;
 
   if (!session) return <Loader width="100%" color="var(--redLight)" />;
 
@@ -41,12 +42,51 @@ export default async function FriendsPage({ searchParams }: FriendsPageParams) {
   const { friends, friendsAddedMe } = user;
   const friendsStatus = checkRelationShipStatus(friends, friendsAddedMe);
 
+  const renderList = () => {
+    /** Show new user. */
+    if (friend && friend.startsWith('@')) {
+      return (
+        <NewFriend
+          sessionUsername={session.user.username}
+          friendSearchParam={friend}
+        />
+      );
+    }
+    /** Show searched user. */
+    if (friend) {
+      return (
+        <UserFriendsList
+          friendSearchParam={friend}
+          friendsStatus={friendsStatus}
+          sessionUserName={session.user.username}
+        />
+      );
+    }
+    return (
+      <>
+        <UserFriendsList
+          friendsStatus={friendsStatus}
+          showFriendsAwaitingApproval
+        />
+        <UserFriendsList friendsStatus={friendsStatus} showFriends />
+        <UserFriendsList
+          friendsStatus={friendsStatus}
+          showFriendsYouSendRequestTo
+        />
+      </>
+    );
+  };
+
   return (
     <div className="flex flex-col justify-center items-center gap-20 transition-all">
       <Title>My Friends</Title>
       <div className="flex flex-col justify-center items-center gap-4">
         <Suspense fallback={'Loading...'}>
-          <SearchInput />
+          <SearchInput
+            name="friend"
+            label="Search..."
+            searchParamsKey="friend"
+          />
         </Suspense>
 
         <div className=" text-center text-gray-300 text-md font-light">
@@ -60,29 +100,7 @@ export default async function FriendsPage({ searchParams }: FriendsPageParams) {
           <RxCornerTopRight className=" h-10 w-auto justify-self-end" />
 
           <div className="grid overflow-auto px-10 col-start-1 col-end-3 transition-all gap-y-7 scroll-smooth max-h-80 ">
-            <Suspense fallback={'Loading...'}>
-              {term ? (
-                <>
-                  <UserFriendsList
-                    term={term}
-                    friendsStatus={friendsStatus}
-                    sessionUserName={session.user.name!}
-                  />
-                </>
-              ) : (
-                <>
-                  <UserFriendsList
-                    friendsStatus={friendsStatus}
-                    showFriendsAwaitingApproval
-                  />
-                  <UserFriendsList friendsStatus={friendsStatus} showFriends />
-                  <UserFriendsList
-                    friendsStatus={friendsStatus}
-                    showFriendsYouSendRequestTo
-                  />
-                </>
-              )}
-            </Suspense>
+            <Suspense fallback={'Loading...'}>{renderList()}</Suspense>
           </div>
 
           <RxCornerBottomLeft className=" h-10 w-auto" />

@@ -8,6 +8,8 @@
 
 .form-focus {
   input:focus ~ label,
+  textarea:focus ~ label,
+  textarea:valid ~ label,
   input:valid ~ label {
     top: -20px;
     font-size: small;

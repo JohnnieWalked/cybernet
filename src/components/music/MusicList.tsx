@@ -5,21 +5,18 @@ import MusicPlayer from './MusicPlayer';
 import { getAllMusic } from '@/data/music';
 
 interface MusicListParams {
-  searchParams: {
-    term: string;
-  };
+  searchForSong: string;
 }
 
-export default async function MusicList({ searchParams }: MusicListParams) {
+export default async function MusicList({ searchForSong }: MusicListParams) {
   const playlist = await getAllMusic();
-  const { term } = searchParams;
   let filteredPlaylist;
 
   if (!playlist) return 'Something went wrong.';
 
-  if (term) {
+  if (searchForSong) {
     const filterSongs = playlist.filter((item) =>
-      item.name.toLowerCase().includes(term)
+      item.name.toLowerCase().includes(searchForSong)
     );
     filteredPlaylist = filterSongs.map((item) => (
       <MusicItem key={item.id} song={item} />
@@ -36,7 +33,7 @@ export default async function MusicList({ searchParams }: MusicListParams) {
         <MusicPlayer musicList={playlist} />
       </div>
       <div className=" grid py-5 gap-3 w-full auto-rows-max overflow-y-auto scroll-smooth ">
-        {term ? filteredPlaylist : renderSongs}
+        {searchForSong ? filteredPlaylist : renderSongs}
       </div>
     </div>
   );

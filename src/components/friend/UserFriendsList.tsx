@@ -1,8 +1,5 @@
 import type { Session } from 'next-auth/types';
 
-/* data */
-import { getUserByUsername } from '@/data/user';
-
 /* components */
 import FriendListItem from './FriendListItem';
 
@@ -12,7 +9,7 @@ interface FriendsSearchProps {
     requestSendFriends: Session['user'][];
     awaitingApprovalFriends: Session['user'][];
   };
-  term?: string;
+  friendSearchParam?: string;
   sessionUserName?: string;
   showFriends?: boolean;
   showFriendsYouSendRequestTo?: boolean;
@@ -21,8 +18,7 @@ interface FriendsSearchProps {
 
 export default async function UserFriendsList({
   friendsStatus,
-  term,
-  sessionUserName,
+  friendSearchParam,
   showFriends,
   showFriendsAwaitingApproval,
   showFriendsYouSendRequestTo,
@@ -38,8 +34,20 @@ export default async function UserFriendsList({
     return <>{friendsAwaitingApproval}</>;
   }
 
-  /** Users, that are already your friends. */
+  /** Users, that are already your friends.
+   *  If searchParam exists => filter users, that are already your friends, and return filtered users.
+   */
   if (showFriends) {
+    if (friendSearchParam) {
+      const filteredFriendsAlready = friendsStatus.friendsAlready.filter(
+        (user) =>
+          user.name!.toLowerCase().includes(friendSearchParam) ||
+          user.username.toLowerCase().includes(friendSearchParam)
+      );
+      return filteredFriendsAlready.map((user) => (
+        <FriendListItem key={user.username} user={user} friendAlready />
+      ));
+    }
     const friendsAlready = friendsStatus.friendsAlready.map((user) => (
       <FriendListItem key={user.username} user={user} friendAlready />
     ));
@@ -62,73 +70,49 @@ export default async function UserFriendsList({
     return <>{friendsYouSentRequestTo}</>;
   }
 
-  /** Show new user. */
-  if (term) {
-    if (term.startsWith('@')) {
-      if (term.substring(1).toLowerCase() === sessionUserName)
-        return <div>Oops, nothing here...</div>;
-
-      const findNewFriend = await getUserByUsername(term.substring(1));
-
-      if (!findNewFriend) return <div>Oops, nothing here...</div>;
-
-      const renderFindNewFriend = (
-        <FriendListItem
-          key={findNewFriend.username}
-          user={findNewFriend}
-          isNewFriend
-        />
-      );
-
-      return <>{renderFindNewFriend}</>;
-    } else {
-      /** Show filtered friends. */
-      const awaitingApprovalFriends = friendsStatus.awaitingApprovalFriends.map(
-        (friend, index) => {
-          if (
-            friend.name!.toLowerCase().includes(term) ||
-            friend.username.toLowerCase().includes(term)
-          ) {
-            return (
-              <FriendListItem key={index} user={friend} acceptFriendRequest />
-            );
-          }
-        }
-      );
-
-      const friends = friendsStatus.friendsAlready.map((friend, index) => {
+  if (friendSearchParam) {
+    /** Show filtered friends. */
+    const awaitingApprovalFriends = friendsStatus.awaitingApprovalFriends.map(
+      (friend, index) => {
         if (
-          friend.name!.toLowerCase().includes(term) ||
-          friend.username.toLowerCase().includes(term)
+          friend.name!.toLowerCase().includes(friendSearchParam) ||
+          friend.username.toLowerCase().includes(friendSearchParam)
         ) {
-          return <FriendListItem key={index} user={friend} friendAlready />;
+          return (
+            <FriendListItem key={index} user={friend} acceptFriendRequest />
+          );
         }
-      });
+      }
+    );
 
-      const sendRequestTo = friendsStatus.requestSendFriends.map(
-        (friend, index) => {
-          if (
-            friend.name!.toLowerCase().includes(term) ||
-            friend.username.toLowerCase().includes(term)
-          ) {
-            return (
-              <FriendListItem
-                key={index}
-                user={friend}
-                friendYouSentRequestTo
-              />
-            );
-          }
+    const friends = friendsStatus.friendsAlready.map((friend, index) => {
+      if (
+        friend.name!.toLowerCase().includes(friendSearchParam) ||
+        friend.username.toLowerCase().includes(friendSearchParam)
+      ) {
+        return <FriendListItem key={index} user={friend} friendAlready />;
+      }
+    });
+
+    const sendRequestTo = friendsStatus.requestSendFriends.map(
+      (friend, index) => {
+        if (
+          friend.name!.toLowerCase().includes(friendSearchParam) ||
+          friend.username.toLowerCase().includes(friendSearchParam)
+        ) {
+          return (
+            <FriendListItem key={index} user={friend} friendYouSentRequestTo />
+          );
         }
-      );
+      }
+    );
 
-      return (
-        <>
-          {awaitingApprovalFriends}
-          {friends}
-          {sendRequestTo}
-        </>
-      );
-    }
+    return (
+      <>
+        {awaitingApprovalFriends}
+        {friends}
+        {sendRequestTo}
+      </>
+    );
   }
 }

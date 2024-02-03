@@ -26,12 +26,25 @@ export const paths = {
 
   userFriends(friend?: string) {
     if (friend) {
-      return `/home/friends?term=${friend}`;
+      return `/home/friends?friend=${friend}`;
     }
     return `/home/friends`;
   },
 
-  userPosts() {
+  /**
+   * First argument is responsible for filter friend list on Posts Page.
+   * Second argument is responsible for filter posts by title on Posts Page.
+   */
+  userPosts(friend?: string, postTitle?: string) {
+    if (friend && postTitle) {
+      return `/home/posts?friend=${friend}&post=${postTitle}`;
+    }
+    if (friend) {
+      return `/home/posts?friend=${friend}`;
+    }
+    if (postTitle) {
+      return `/home/posts?post=${postTitle}`;
+    }
     return `/home/posts`;
   },
 
@@ -45,7 +58,7 @@ export const paths = {
 
   music(song?: string) {
     if (song) {
-      return `/home/music?term=${song}`;
+      return `/home/music?song=${song}`;
     }
     return `/home/music`;
   },

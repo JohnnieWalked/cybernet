@@ -22,3 +22,11 @@ export const SignInSchema = z.object({
   signin: z.string(),
   password: z.string(),
 });
+
+export const CreatePostSchema = z.object({
+  title: z
+    .string()
+    .min(1, { message: 'This field has to be filled.' })
+    .max(15, { message: 'Maximum 15 characters.' }),
+  content: z.string().min(1, { message: 'This field has to be filled.' }),
+});
