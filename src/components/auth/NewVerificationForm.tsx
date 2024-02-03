@@ -58,7 +58,7 @@ export default function NewVerificationForm() {
               />
             </>
           )}
-          <FormButtonPrimary>
+          <FormButtonPrimary type="button">
             <a href={paths.loginPage()}>back to login</a>
           </FormButtonPrimary>
         </div>
