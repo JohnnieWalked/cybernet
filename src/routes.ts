@@ -35,7 +35,10 @@ export const paths = {
    * First argument is responsible for filter friend list on Posts Page.
    * Second argument is responsible for filter posts by title on Posts Page.
    */
-  userPosts(friend?: string, postTitle?: string) {
+  userPosts(friend?: string, postTitle?: string, myPosts: boolean = false) {
+    if (myPosts) {
+      return `/home/posts?myPosts=${myPosts}`;
+    }
     if (friend && postTitle) {
       return `/home/posts?friend=${friend}&post=${postTitle}`;
     }

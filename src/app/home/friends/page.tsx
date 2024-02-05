@@ -7,7 +7,7 @@ import { auth } from '@/auth';
 import { checkRelationShipStatus } from '@/helpers/checkRelationShipStatus';
 
 /* data */
-import { getUserFriendsAndRelationsById } from '@/data/user';
+import { getUserFriendsAndRelationsById } from '@/data/cached/get-friends-&-relations-by-id';
 
 /* components */
 import Title from '@/components/common/Title';

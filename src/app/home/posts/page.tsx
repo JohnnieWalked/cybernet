@@ -10,9 +10,10 @@ import Title from '@/components/common/Title';
 import SearchInput from '@/components/common/SearchInput';
 import PostList from '@/components/posts/PostList';
 import PostForm from '@/components/posts/PostForm';
+import InputCheckbox from '@/components/common/InputCheckbox';
 
 /* data */
-import { getUserFriendsAndRelationsById } from '@/data/user';
+import { getUserFriendsAndRelationsById } from '@/data/cached/get-friends-&-relations-by-id';
 
 /* helpers */
 import { checkRelationShipStatus } from '@/helpers/checkRelationShipStatus';
@@ -21,12 +22,13 @@ interface PostsPageParams {
   searchParams: {
     friend: string;
     post: string;
+    myPosts: string;
   };
 }
 
 export default async function PostsPage({ searchParams }: PostsPageParams) {
+  const { friend, post, myPosts } = searchParams;
   const session = await auth();
-  const { friend, post } = searchParams;
 
   if (!session) return <Loader width="100%" color="var(--redLight)" />;
 
@@ -35,6 +37,12 @@ export default async function PostsPage({ searchParams }: PostsPageParams) {
 
   const { friends, friendsAddedMe } = user;
   const friendsStatus = checkRelationShipStatus(friends, friendsAddedMe);
+
+  const filteredFriends = friends.filter(
+    (user) =>
+      user.name?.toLocaleLowerCase().includes(friend) ||
+      user.username.toLocaleLowerCase().includes(friend)
+  );
 
   return (
     <section className="flex flex-col w-full h-full justify-center items-center gap-10">
@@ -67,10 +75,23 @@ export default async function PostsPage({ searchParams }: PostsPageParams) {
             </Suspense>
           </div>
         </div>
-        <div>
-          <PostList friends={friendsStatus.friendsAlready} />
+        <div className=" flex flex-col w-full h-full text-white ">
+          <Suspense fallback="Loading...">
+            {friend ? (
+              <PostList clearOldPosts friends={filteredFriends} />
+            ) : (
+              <PostList friends={friendsStatus.friendsAlready} />
+            )}
+          </Suspense>
         </div>
-        <PostForm />
+        <div className="flex flex-col gap-5">
+          <PostForm />
+          <InputCheckbox
+            searchParamsKey="myPosts"
+            name="myPosts"
+            label="Show my posts only"
+          />
+        </div>
       </div>
     </section>
   );

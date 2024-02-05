@@ -32,9 +32,11 @@ function SearchInput({ name, label, searchParamsKey }: SearchInputProps) {
       actions.searchForMusic.bind(null, inputValue)();
     }
     if (pathname.includes(paths.userPosts())) {
-      actions.filterFriendsPosts.bind(null, inputValue)();
+      if (searchParamsKey === 'friend')
+        actions.filterFriendsPosts.bind(null, inputValue)();
+      // if (searchParamsKey === 'post')
     }
-  }, [inputValue, pathname]);
+  }, [inputValue, searchParamsKey, pathname]);
 
   return (
     <Input

@@ -42,22 +42,6 @@ export async function getUserById(id: string) {
   }
 }
 
-export async function getUserFriendsAndRelationsById(id: string) {
-  try {
-    const user = await db.user.findUnique({
-      where: { id: id },
-      select: {
-        friends: true,
-        friendsAddedMe: true,
-      },
-    });
-
-    return user;
-  } catch (error) {
-    return null;
-  }
-}
-
 export async function getUserAndHisFriendsByUsername(username: string) {
   try {
     const user = await db.user.findUnique({

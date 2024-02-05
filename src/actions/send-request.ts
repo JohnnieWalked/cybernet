@@ -1,7 +1,7 @@
 'use server';
 
 import type { Session } from 'next-auth/types';
-import { getUserFriendsAndRelationsById } from '@/data/user';
+import { getUserFriendsAndRelationsById } from '@/data/cached/get-friends-&-relations-by-id';
 import { db } from '@/db';
 import { auth } from '@/auth';
 
