@@ -38,12 +38,6 @@ export default async function PostsPage({ searchParams }: PostsPageParams) {
   const { friends, friendsAddedMe } = user;
   const friendsStatus = checkRelationShipStatus(friends, friendsAddedMe);
 
-  const filteredFriends = friends.filter(
-    (user) =>
-      user.name?.toLocaleLowerCase().includes(friend) ||
-      user.username.toLocaleLowerCase().includes(friend)
-  );
-
   return (
     <section className="flex flex-col w-full h-full justify-center items-center gap-10">
       <Title>Posts</Title>
@@ -76,9 +70,16 @@ export default async function PostsPage({ searchParams }: PostsPageParams) {
           </div>
         </div>
         <div className=" flex flex-col w-full h-full text-white ">
+          {/* if friend is in search props => pass filtered list */}
           <Suspense fallback="Loading...">
             {friend ? (
-              <PostList clearOldPosts friends={filteredFriends} />
+              <PostList
+                friends={friends.filter(
+                  (user) =>
+                    user.name?.toLocaleLowerCase().includes(friend) ||
+                    user.username.toLocaleLowerCase().includes(friend)
+                )}
+              />
             ) : (
               <PostList friends={friendsStatus.friendsAlready} />
             )}

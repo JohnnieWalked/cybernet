@@ -7,21 +7,25 @@ export type ModifiedPost = Post | { createdAt: string; updatedAt: string };
 
 interface PostsSliceType {
   postsArray: ModifiedPost[];
-  take: number;
-  skip: number;
+  takeDefault: number;
+  skipDefault: number;
+  currentTake: number;
+  currentSkip: number;
 }
 
 const initialState: PostsSliceType = {
   postsArray: [],
-  take: 3,
-  skip: 0,
+  takeDefault: 3,
+  skipDefault: 0,
+  currentTake: 3,
+  currentSkip: 0,
 };
 
 export const postsSlice = createSlice({
   name: 'posts',
   initialState,
   reducers: {
-    updatePostsArray: (state, action: PayloadAction<ModifiedPost[]>) => {
+    patchPostsArray: (state, action: PayloadAction<ModifiedPost[]>) => {
       /* convert from Date (non-serialized value) to DateString */
       action.payload.forEach((post) => {
         if (typeof post.createdAt !== 'string')
@@ -31,8 +35,15 @@ export const postsSlice = createSlice({
       });
       state.postsArray.push(...action.payload);
     },
-    clearPostsArray: (state) => {
-      state.postsArray = [];
+    updatePostsArray: (state, action: PayloadAction<ModifiedPost[]>) => {
+      /* convert from Date (non-serialized value) to DateString */
+      action.payload.forEach((post) => {
+        if (typeof post.createdAt !== 'string')
+          post.createdAt = post.createdAt.toDateString();
+        if (typeof post.updatedAt !== 'string')
+          post.updatedAt = post.updatedAt.toDateString();
+      });
+      state.postsArray = action.payload;
     },
   },
 });

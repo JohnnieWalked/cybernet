@@ -4,17 +4,10 @@
 import { useAppDispatch, useAppSelector } from '@/hooks/redux-typed-hooks';
 import { postsSliceActions } from '@/store/slices/postsSlice';
 
-import {
-  useCallback,
-  useEffect,
-  useMemo,
-  useState,
-  useTransition,
-} from 'react';
+import { useEffect, useMemo, useTransition } from 'react';
 
 /* types */
 import { Session } from 'next-auth/types';
-import type { Post } from '@prisma/client';
 
 /* actions */
 import * as actions from '@/actions';
@@ -24,41 +17,30 @@ import Loader from '../common/Loader';
 import PostItem from './PostItem';
 
 type PostItemProps = {
-  clearOldPosts?: boolean;
+  friendSearchParam?: string;
   friends: Session['user'][];
 };
 
-export default function PostList({
-  friends,
-  clearOldPosts = false,
-}: PostItemProps) {
+export default function PostList({ friends }: PostItemProps) {
   const dispatch = useAppDispatch();
-  const { postsArray, take, skip } = useAppSelector(
-    (state) => state.postsSlice
-  );
+  const { postsArray, takeDefault, skipDefault, currentSkip, currentTake } =
+    useAppSelector((state) => state.postsSlice);
   const [isPending, startTransition] = useTransition();
 
   /* fetch users' posts */
-  const fetchFriendsPosts = useCallback(
-    (users: Session['user'][], take: number, skip: number) => {
-      console.log('SERVER-ACTION-CALLBACK');
-
-      startTransition(() => {
-        users.forEach(async (user) => {
-          const res = await actions.getFriendPosts(user.id, take, skip);
-          dispatch(postsSliceActions.updatePostsArray(res));
-          console.log(res);
-        });
-      });
-    },
-    [dispatch]
-  );
-
   useEffect(() => {
-    if (clearOldPosts) dispatch(postsSliceActions.clearPostsArray());
-
-    fetchFriendsPosts(friends, take, skip);
-  }, [clearOldPosts, dispatch, fetchFriendsPosts, friends, skip, take]);
+    startTransition(() => {
+      friends.forEach(async (user) => {
+        const res = await actions.getFriendPosts(
+          user.id,
+          takeDefault,
+          skipDefault
+        );
+        dispatch(postsSliceActions.updatePostsArray(res));
+        console.log(res);
+      });
+    });
+  }, [dispatch, friends, skipDefault, takeDefault]);
 
   const renderPosts = useMemo(() => {
     return postsArray.map((post, index) => (
