@@ -20,6 +20,12 @@ export async function getUserByUsername(username: string) {
       where: {
         username: username,
       },
+      select: {
+        id: true,
+        name: true,
+        username: true,
+        image: true,
+      },
     });
 
     return user;
@@ -42,15 +48,36 @@ export async function getUserById(id: string) {
   }
 }
 
-export async function getUserAndHisFriendsByUsername(username: string) {
-  try {
-    const user = await db.user.findUnique({
-      where: { username: username },
-      include: { friends: true, friendsAddedMe: true },
-    });
+// export async function getUserAndHisFriendsByUsername(username: string) {
+//   try {
+//     const user = await db.user.findUnique({
+//       where: { username: username },
+//       select: {
+//         id: true,
+//         username: true,
+//         name: true,
+//         image: true,
+//         friends: {
+//           select: {
+//             id: true,
+//             username: true,
+//             name: true,
+//             image: true,
+//           },
+//         },
+//         friendsAddedMe: {
+//           select: {
+//             id: true,
+//             username: true,
+//             name: true,
+//             image: true,
+//           },
+//         },
+//       },
+//     });
 
-    return user;
-  } catch (error) {
-    return null;
-  }
-}
+//     return user;
+//   } catch (error) {
+//     return null;
+//   }
+// }

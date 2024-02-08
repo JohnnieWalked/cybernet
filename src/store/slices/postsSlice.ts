@@ -29,9 +29,9 @@ export const postsSlice = createSlice({
       /* convert from Date (non-serialized value) to DateString */
       action.payload.forEach((post) => {
         if (typeof post.createdAt !== 'string')
-          post.createdAt = post.createdAt.toDateString();
+          post.createdAt = post.createdAt.toLocaleDateString();
         if (typeof post.updatedAt !== 'string')
-          post.updatedAt = post.updatedAt.toDateString();
+          post.updatedAt = post.updatedAt.toLocaleDateString();
       });
       state.postsArray.push(...action.payload);
     },
@@ -39,11 +39,14 @@ export const postsSlice = createSlice({
       /* convert from Date (non-serialized value) to DateString */
       action.payload.forEach((post) => {
         if (typeof post.createdAt !== 'string')
-          post.createdAt = post.createdAt.toDateString();
+          post.createdAt = post.createdAt.toLocaleDateString();
         if (typeof post.updatedAt !== 'string')
-          post.updatedAt = post.updatedAt.toDateString();
+          post.updatedAt = post.updatedAt.toLocaleDateString();
       });
-      state.postsArray = action.payload;
+      state.postsArray.push(...action.payload);
+    },
+    clearPostsArray: (state) => {
+      state.postsArray = [];
     },
   },
 });

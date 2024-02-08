@@ -8,6 +8,18 @@
   }
 }
 
+.post_wrapper {
+  @include shadow-list;
+  &::before {
+    border-left: 3px solid #aefff9;
+    border-right: none;
+    border-radius: 20px;
+  }
+  &::after {
+    border-radius: 20px;
+  }
+}
+
 .post-btn {
   // font-family: inherit;
   font-size: 18px;

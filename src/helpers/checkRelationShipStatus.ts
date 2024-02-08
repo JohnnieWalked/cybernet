@@ -1,8 +1,8 @@
-import { Session } from 'next-auth/types';
+import { ModifiedUser } from '@/types';
 
 export function checkRelationShipStatus(
-  friendsYouAdded: Session['user'][],
-  friendsAddedYou: Session['user'][]
+  friendsYouAdded: ModifiedUser[],
+  friendsAddedYou: ModifiedUser[]
 ) {
   const friendsAlready = friendsYouAdded.filter((friend) =>
     friendsAddedYou.some((friendAddedYou) => friend.id === friendAddedYou.id)
