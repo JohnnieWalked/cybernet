@@ -59,13 +59,16 @@ export default function PostList({ friends }: PostItemProps) {
   }, [dispatch, friends, friendsArray, skipDefault, takeDefault]);
 
   const renderPosts = useMemo(() => {
-    // const sortedPostsArrayByDate = postsArray.sort(
-    //   (a, b) => a.createdAt.split()
-    // );
-    // console.log('NOT SORTED', posts);
-    // console.log('SORTED', sortedPostsByDate);
-    // return sortedPostsByDate;
-    return postsArray.map((post, index) => (
+    const sortedPostsArrayByDate = postsArray.slice().sort((a, b) => {
+      if (typeof a.createdAt === 'string' && typeof b.createdAt === 'string') {
+        const dateA = a.createdAt.split('.').reverse().join('');
+        const dateB = b.createdAt.split('.').reverse().join('');
+        return dateB.localeCompare(dateA);
+      } else {
+        return 0;
+      }
+    });
+    return sortedPostsArrayByDate.map((post, index) => (
       <PostItem post={post} key={index} />
     ));
   }, [postsArray]);
