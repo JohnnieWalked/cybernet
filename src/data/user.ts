@@ -20,12 +20,6 @@ export async function getUserByUsername(username: string) {
       where: {
         username: username,
       },
-      select: {
-        id: true,
-        name: true,
-        username: true,
-        image: true,
-      },
     });
 
     return user;
