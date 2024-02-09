@@ -8,7 +8,7 @@ import { friendsSliceActions } from '@/store/slices/friendsSlice';
 import { useEffect, useMemo, useTransition } from 'react';
 
 /* types */
-import { ModifiedUser } from '@/types';
+import { ModifiedUser, ModifiedPost } from '@/types';
 
 /* actions */
 import * as actions from '@/actions';
@@ -51,7 +51,16 @@ export default function PostList({ friends }: PostItemProps) {
             .then((posts) => {
               if (!posts) return;
 
-              dispatch(postsSliceActions.updatePostsArray(posts));
+              /* convert from Date (non-serialized value) to DateString */
+              const modifiedPosts: ModifiedPost[] = posts.map((post) => {
+                return {
+                  ...post,
+                  createdAt: post.createdAt.toLocaleDateString(),
+                  updatedAt: post.updatedAt.toLocaleDateString(),
+                };
+              });
+
+              dispatch(postsSliceActions.updatePostsArray(modifiedPosts));
             });
         });
       });
@@ -59,19 +68,17 @@ export default function PostList({ friends }: PostItemProps) {
   }, [dispatch, friends, friendsArray, skipDefault, takeDefault]);
 
   const renderPosts = useMemo(() => {
+    /* make copy and sort array of posts */
     const sortedPostsArrayByDate = postsArray.slice().sort((a, b) => {
-      if (typeof a.createdAt === 'string' && typeof b.createdAt === 'string') {
-        const dateA = a.createdAt.split('.').reverse().join('');
-        const dateB = b.createdAt.split('.').reverse().join('');
-        return dateB.localeCompare(dateA);
-      } else {
-        return 0;
-      }
+      const dateA = a.createdAt.split('.').reverse().join('');
+      const dateB = b.createdAt.split('.').reverse().join('');
+      return dateB.localeCompare(dateA);
     });
-    return sortedPostsArrayByDate.map((post, index) => (
-      <PostItem post={post} key={index} />
-    ));
-  }, [postsArray]);
+    return sortedPostsArrayByDate.map((post, index) => {
+      const user = friends.find((item) => item.id === post.authorId);
+      return <PostItem user={user} post={post} key={index} />;
+    });
+  }, [friends, postsArray]);
 
   return (
     <>

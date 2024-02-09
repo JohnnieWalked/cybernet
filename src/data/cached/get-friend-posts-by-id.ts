@@ -11,6 +11,13 @@ export const getFriendPostsByID = cache(
         orderBy: {
           createdAt: 'desc',
         },
+        include: {
+          likedBy: {
+            select: {
+              id: true,
+            },
+          },
+        },
       });
 
       return posts;
