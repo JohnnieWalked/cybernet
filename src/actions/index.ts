@@ -12,3 +12,4 @@ export { createPost } from './create-post';
 export { filterFriendsPosts } from './filter-friends-posts';
 export { showMyPosts } from './show-my-posts';
 export { getFriendPosts } from './get-friend-posts';
+export { likePost } from './like-post';

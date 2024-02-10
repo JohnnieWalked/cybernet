@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useSession } from 'next-auth/react';
 
 /* types */
@@ -8,6 +8,9 @@ import type { ModifiedUser, ModifiedPost } from '@/types';
 
 /* components */
 import UserAvatar from '../user/UserAvatar';
+
+/* actions */
+import * as actions from '@/actions';
 
 /* icons */
 import { IoIosHeartEmpty } from 'react-icons/io';
@@ -21,14 +24,41 @@ type PostItemProps = {
 export default function PostItem({ post, user }: PostItemProps) {
   const session = useSession();
   const [likeCounter, setLikeCounter] = useState(post.likedBy.length);
-  const [heartStatus, setHeartStatus] = useState(false);
+  const [heartStatus, setHeartStatus] = useState<boolean | undefined>();
+  const [spamCounter, setSpamCounter] = useState(0);
 
-  const handleLikeClick = async () => {
-    if (!session.data?.user) return;
-    if (post.likedBy.find((likedBy) => likedBy.id === session.data.user.id)) {
-      setHeartStatus(false);
+  /* debounce like */
+  useEffect(() => {
+    if (!spamCounter) return;
+
+    const sendLikeRequestTimeout = setTimeout(() => {
+      console.log('SEND LIKE TO DB', spamCounter);
+      setSpamCounter(0);
+    }, 5000);
+
+    return () => clearTimeout(sendLikeRequestTimeout);
+  }, [spamCounter]);
+
+  /* set like status */
+  useEffect(() => {
+    if (!session.data) return;
+
+    if (post.likedBy.find((user) => user.id === session.data.user.id)) {
+      setHeartStatus(true);
     } else {
-      if (!heartStatus) setLikeCounter(likeCounter + 1);
+      setHeartStatus(false);
+    }
+  }, [post.likedBy, session.data]);
+
+  const handleClick = () => {
+    if (spamCounter > 3) return;
+    setSpamCounter(spamCounter + 1);
+
+    if (heartStatus) {
+      setHeartStatus(false);
+      setLikeCounter(likeCounter - 1);
+    } else {
+      setLikeCounter(likeCounter + 1);
       setHeartStatus(true);
     }
   };
@@ -52,13 +82,17 @@ export default function PostItem({ post, user }: PostItemProps) {
         <div className=" flex items-center gap-2 text-gray-500">
           {heartStatus ? (
             <IoHeart
-              onClick={handleLikeClick}
-              className="cursor-pointer transition-all fill-red-600"
+              onClick={handleClick}
+              className={`cursor-pointer transition-all fill-red-600 ${
+                spamCounter > 3 ? 'opacity-30' : ''
+              }`}
             />
           ) : (
             <IoIosHeartEmpty
-              onClick={handleLikeClick}
-              className="cursor-pointer transition-all"
+              onClick={handleClick}
+              className={`cursor-pointer transition-all ${
+                spamCounter > 3 ? 'opacity-30' : ''
+              }`}
             />
           )}
 

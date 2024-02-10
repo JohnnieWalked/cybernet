@@ -89,7 +89,7 @@ export default function PostList({ friends }: PostItemProps) {
           color="var(--redLight)"
         />
       ) : (
-        renderPosts
+        <div className=" overflow-y-auto pr-3">{renderPosts}</div>
       )}
     </>
   );

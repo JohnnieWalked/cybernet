@@ -47,7 +47,7 @@ export default async function PostsPage({ searchParams }: PostsPageParams) {
         searchParamsKey="post"
       />
 
-      <div className=" grid grid-cols-[minmax(200px,_300px),_1fr,_minmax(200px,_300px)] grid-rows-[minmax(400px,_600px)] w-full h-full px-10 gap-20">
+      <div className="relarive grid grid-cols-[minmax(200px,_300px),_1fr,_minmax(200px,_300px)] grid-rows-[minmax(400px,_600px)] w-full h-full px-10 gap-12">
         <div className="postsFriendList flex flex-col h-full w-full gap-3 text-cyan-400 rounded-[20px] bg-[rgba(0,_0,_0,_0.3)]">
           <span className=" text-[var(--yellow)] text-center text-xl z-10 font-bold tracking-wider">
             Friend List
@@ -69,7 +69,7 @@ export default async function PostsPage({ searchParams }: PostsPageParams) {
             </Suspense>
           </div>
         </div>
-        <div className=" flex flex-col w-full h-full text-white ">
+        <div className="postList_wrapper flex flex-col w-full h-full text-white rounded-[20px] bg-[rgba(0,_0,_0,_0.3)]">
           {/* if friend is in search props => pass filtered list */}
           <Suspense fallback="Loading...">
             {friend ? (
@@ -85,7 +85,7 @@ export default async function PostsPage({ searchParams }: PostsPageParams) {
             )}
           </Suspense>
         </div>
-        <div className="post_wrapper flex flex-col justify-center gap-5 bg-[rgba(0,_0,_0,_0.3)]">
+        <div className="post_wrapper flex flex-col justify-center gap-5 rounded-[20px] bg-[rgba(0,_0,_0,_0.3)]">
           <PostForm />
           <InputCheckbox
             searchParamsKey="myPosts"

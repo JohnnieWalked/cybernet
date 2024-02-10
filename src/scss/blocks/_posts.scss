@@ -8,6 +8,18 @@
   }
 }
 
+.postList_wrapper {
+  @include shadow-list;
+  &::before {
+    border: none;
+    z-index: -1;
+  }
+  &::after {
+    border-radius: 20px;
+    z-index: 1;
+  }
+}
+
 .post_wrapper {
   @include shadow-list;
   &::before {
