@@ -29,10 +29,10 @@ export default function PostItem({ post, user }: PostItemProps) {
 
   /* debounce like */
   useEffect(() => {
-    if (!spamCounter) return;
+    if (!spamCounter || !session.data) return;
 
     const sendLikeRequestTimeout = setTimeout(() => {
-      console.log('SEND LIKE TO DB', spamCounter);
+      actions.likePost(post.id, session.data.user.id);
       setSpamCounter(0);
     }, 5000);
 

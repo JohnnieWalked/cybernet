@@ -2,9 +2,20 @@
 
 **"CyberNet"** is a custom web social app developed with Next.js and Auth.js in "*Cyberpunk 2077*" style.
 
+**Fast travel**:
+
+- [CYBERNET](#cybernet)
+  - [Techstack](#techstack)
+  - [Technical Explanation](#technical-explanation)
+    - [Sign in \& Sign up functionality](#sign-in--sign-up-functionality)
+    - [Verification functionality](#verification-functionality)
+    - [Friends List Functionality](#friends-list-functionality)
+    - [MP3 Player Functionality](#mp3-player-functionality)
+    - [Posts List functionality](#posts-list-functionality)
+
 ---
 
-## Tech Stack
+## Techstack
 
 **Primary:**
 
@@ -33,7 +44,7 @@
 
 ## Technical Explanation
 
-### Sign in / Sign up functionality
+### Sign in & Sign up functionality
 
 **Sign in** and **Sign up** forms are located in component *`AuthForm.tsx`*. To implement logging and registration we will use server actions, which are provided by Next.js. To manage states of forms with server actions we will use react-dom hook '*useFormState*'. Server actions are situated in folder `actions` in files called `login.ts` and `sign-up.ts`.
 
@@ -148,7 +159,7 @@ await db.verificationToken.delete({
 
 ---
 
-### Friend List Functionality
+### Friends List Functionality
 
 By default, user has additional two columns, which represent his relations with another users. Check out Prisma schema below. `prisma/schema.prisma`:
 
@@ -178,6 +189,39 @@ So, to be more precise, let's imagine two users: *Johnny* and *Panam*.
 - If *Johnny* has *Panam* in `friends`, AND has in `friendsAddedMe` -> means *Panam* and *Johnny* are friends. (Same must be for *Panam*.)
 
 ![Friend list functionality](<Friends func.gif>)
+
+To render friends with different status (reques send / accept request / friend already) we should first filter them. We will use `new Set()`. So let's create a helper function `checkRelationshipStatus.ts`.
+
+```TypeScript
+import { ModifiedUser } from '@/types';
+
+export function checkRelationShipStatus(
+  friendsYouAdded: ModifiedUser[],
+  friendsAddedYou: ModifiedUser[]
+) {
+  const friendsAlready = friendsYouAdded.filter((friend) =>
+    friendsAddedYou.some((friendAddedYou) => friend.id === friendAddedYou.id)
+  );
+
+  const friendsAlreadySet = new Set(friendsAlready.map(({ id }) => id));
+
+  /* filter friends whom You sent request, but they haven't approve yet */
+  const requestSendFriends = friendsYouAdded.filter(
+    ({ id }) => !friendsAlreadySet.has(id)
+  );
+
+  /* filter friends who sent request to You */
+  const awaitingApprovalFriends = friendsAddedYou.filter(
+    ({ id }) => !friendsAlreadySet.has(id)
+  );
+
+  return {
+    friendsAlready,
+    requestSendFriends,
+    awaitingApprovalFriends,
+  };
+}
+```
 
 ---
 
@@ -239,3 +283,8 @@ MP3-player by itself is located on Music Page.
 ![Music Page](image-1.png)
 
 Playlist does not have huge size, so we will get full `playlist.length` after opening Music page. Song id in DB has type Int (Number) with autoincrement '+1'. So after end of the song we will fetch `current song.id + 1`. If `song.id === playlist.length` => fetch song with id '**1**'.
+
+---
+
+### Posts List functionality
+

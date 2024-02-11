@@ -20,10 +20,12 @@ import { areObjectsEqual } from '@/helpers/equalObjects';
 
 type PostItemProps = {
   friendSearchParam?: string;
+  postSearchParam?: string;
+  myPostsSearchParam?: boolean;
   friends: ModifiedUser[];
 };
 
-export default function PostList({ friends }: PostItemProps) {
+export default function PostList({ friends, postSearchParam }: PostItemProps) {
   const dispatch = useAppDispatch();
   const { postsArray, takeDefault, skipDefault, currentSkip, currentTake } =
     useAppSelector((state) => state.postsSlice);
@@ -37,10 +39,8 @@ export default function PostList({ friends }: PostItemProps) {
       friends.length === friendsArray.length &&
       friends.every((user, index) => areObjectsEqual(user, friendsArray[index]))
     ) {
-      console.log('IDENTICAL');
       return;
     } else {
-      console.log('FETCH');
       if (friendsArray.length !== 0)
         dispatch(postsSliceActions.clearPostsArray());
       dispatch(friendsSliceActions.setFriendsArray(friends));
@@ -74,11 +74,20 @@ export default function PostList({ friends }: PostItemProps) {
       const dateB = b.createdAt.split('.').reverse().join('');
       return dateB.localeCompare(dateA);
     });
-    return sortedPostsArrayByDate.map((post, index) => {
-      const user = friends.find((item) => item.id === post.authorId);
-      return <PostItem user={user} post={post} key={index} />;
-    });
-  }, [friends, postsArray]);
+    if (postSearchParam) {
+      return sortedPostsArrayByDate.map((post, index) => {
+        if (post.title.toLowerCase().includes(postSearchParam)) {
+          const user = friends.find((item) => item.id === post.authorId);
+          return <PostItem user={user} post={post} key={index} />;
+        }
+      });
+    } else {
+      return sortedPostsArrayByDate.map((post, index) => {
+        const user = friends.find((item) => item.id === post.authorId);
+        return <PostItem user={user} post={post} key={index} />;
+      });
+    }
+  }, [friends, postSearchParam, postsArray]);
 
   return (
     <>

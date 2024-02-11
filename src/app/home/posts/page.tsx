@@ -38,6 +38,47 @@ export default async function PostsPage({ searchParams }: PostsPageParams) {
   const { friends, friendsAddedMe } = user;
   const friendsStatus = checkRelationShipStatus(friends, friendsAddedMe);
 
+  const renderPostsList = () => {
+    if (friend && !post && !myPosts) {
+      return (
+        <PostList
+          friends={friends.filter(
+            (user) =>
+              user.name?.toLocaleLowerCase().includes(friend) ||
+              user.username.toLocaleLowerCase().includes(friend)
+          )}
+        />
+      );
+    } else if (!friend && post && !myPosts) {
+      return (
+        <PostList
+          postSearchParam={post}
+          friends={friendsStatus.friendsAlready}
+        />
+      );
+    } else if (!friend && !post && !myPosts) {
+      return <PostList friends={friendsStatus.friendsAlready} />;
+    } else if (!friend && !post && myPosts) {
+      return (
+        <PostList
+          myPostsSearchParam={true}
+          friends={friendsStatus.friendsAlready}
+        />
+      );
+    } else if (friend && post && !myPosts) {
+      return (
+        <PostList
+          friends={friends.filter(
+            (user) =>
+              user.name?.toLocaleLowerCase().includes(friend) ||
+              user.username.toLocaleLowerCase().includes(friend)
+          )}
+          postSearchParam={post}
+        />
+      );
+    }
+  };
+
   return (
     <section className="flex flex-col w-full h-full justify-center items-center gap-10">
       <Title>Posts</Title>
@@ -71,19 +112,7 @@ export default async function PostsPage({ searchParams }: PostsPageParams) {
         </div>
         <div className="postList_wrapper flex flex-col w-full h-full text-white rounded-[20px] bg-[rgba(0,_0,_0,_0.3)]">
           {/* if friend is in search props => pass filtered list */}
-          <Suspense fallback="Loading...">
-            {friend ? (
-              <PostList
-                friends={friends.filter(
-                  (user) =>
-                    user.name?.toLocaleLowerCase().includes(friend) ||
-                    user.username.toLocaleLowerCase().includes(friend)
-                )}
-              />
-            ) : (
-              <PostList friends={friendsStatus.friendsAlready} />
-            )}
-          </Suspense>
+          <Suspense fallback="Loading...">{renderPostsList()}</Suspense>
         </div>
         <div className="post_wrapper flex flex-col justify-center gap-5 rounded-[20px] bg-[rgba(0,_0,_0,_0.3)]">
           <PostForm />
