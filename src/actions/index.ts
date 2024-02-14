@@ -9,7 +9,7 @@ export { removeFriend } from './remove-friend';
 export { searchForMusic } from './search-for-music';
 export { getNextSong } from './get-next-song';
 export { createPost } from './create-post';
-export { filterFriendsPosts } from './filter-friends-posts';
+export { urlQueriesPostsPage } from './url-queries-PostsPage';
 export { showMyPosts } from './show-my-posts';
 export { getFriendPosts } from './get-friend-posts';
 export { likePost } from './like-post';

@@ -12,8 +12,7 @@ export async function sendVerificationEmail(email: string, token: string) {
     },
   });
 
-  // change in production mode
-  const confirmLink = `http://localhost:3000/auth/new-verification?token=${token}`; //temporary link
+  const confirmLink = `https://cybernet-jet.vercel.app/auth/new-verification?token=${token}`;
 
   const mailOptions = {
     from: process.env.NODEMAILER_EMAIL,

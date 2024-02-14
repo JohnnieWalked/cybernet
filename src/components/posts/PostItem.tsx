@@ -37,7 +37,7 @@ export default function PostItem({ post, user }: PostItemProps) {
     }, 5000);
 
     return () => clearTimeout(sendLikeRequestTimeout);
-  }, [spamCounter]);
+  }, [post.id, session.data, spamCounter]);
 
   /* set like status */
   useEffect(() => {

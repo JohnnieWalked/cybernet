@@ -94,11 +94,11 @@ export default function NavBar() {
 
         <Link
           className={`menubar-link ${
-            pathname.includes(paths.userPosts()) ? 'active_menubar-link' : ''
+            pathname.includes(paths.userPosts({})) ? 'active_menubar-link' : ''
           }`}
-          href={paths.userPosts()}
+          href={paths.userPosts({})}
         >
-          {pathname.includes(paths.userPosts()) ? (
+          {pathname.includes(paths.userPosts({})) ? (
             <IoIosMailOpen />
           ) : (
             <IoMdMail />

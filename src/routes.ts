@@ -1,3 +1,5 @@
+import type { UserPostsURLPaths } from './types';
+
 /**
  * An array of routes that are accessible to the public.
  * These routes do not require authentication.
@@ -32,23 +34,29 @@ export const paths = {
   },
 
   /**
-   * First argument is responsible for filter friend list on Posts Page.
-   * Second argument is responsible for filter posts by title on Posts Page.
+   *
    */
-  userPosts(friend?: string, postTitle?: string, myPosts: boolean = false) {
+  userPosts(params: UserPostsURLPaths) {
+    const { myPosts } = params;
+
+    const paramsKeys = Object.keys(params);
+
+    /* if no params */
+    if (!myPosts && paramsKeys.length === 0) return `/home/posts`;
+
     if (myPosts) {
       return `/home/posts?myPosts=${myPosts}`;
     }
-    if (friend && postTitle) {
-      return `/home/posts?friend=${friend}&post=${postTitle}`;
+
+    if (paramsKeys.length === 1) {
+      return `/home/posts?${Object.keys(params)[0]}=${
+        Object.values(params)[0]
+      }`;
+    } else {
+      const arrayKeyValue = Object.entries(params);
+
+      return `/home/posts?${arrayKeyValue[0][0]}=${arrayKeyValue[0][1]}&${arrayKeyValue[1][0]}=${arrayKeyValue[1][1]}`;
     }
-    if (friend) {
-      return `/home/posts?friend=${friend}`;
-    }
-    if (postTitle) {
-      return `/home/posts?post=${postTitle}`;
-    }
-    return `/home/posts`;
   },
 
   userSettings() {

@@ -9,3 +9,13 @@ export type ModifiedPost = Omit<Post, 'createdAt' | 'updatedAt'> & {
     id: string;
   }[];
 };
+export type UserPostsURLPaths = {
+  myPosts?: boolean;
+  [paramKey: string]:
+    | {
+        [key: string]: string;
+      }
+    | string
+    | boolean
+    | undefined;
+};
