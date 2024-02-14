@@ -30,12 +30,12 @@ export async function urlQueriesPostsPage(
       if (key !== searchParamsKey) {
         params[key] = value;
       } else {
-        if (!inputValue) break;
+        if (!inputValue) break; // break to avoid passing empty value to url (without it will be for example /?post=somePost&friend=)
         params[searchParamsKey] = inputValue;
       }
     }
   } else {
-  /* else, if there are no key which equals searchParamsKey -> create new key in url and keep other keys with values */
+    /* else, if there are no key which equals searchParamsKey -> create new key in url and keep other keys with values */
     params[searchParamsKey] = inputValue;
     for (let [key, value] of searchParamsEntries) {
       params[key] = value;
