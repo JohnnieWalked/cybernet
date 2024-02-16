@@ -75,6 +75,7 @@ export default async function PostsPage({ searchParams }: PostsPageParams) {
               friends={friendsStatus.friendsAlready}
               postSearchParam={post}
               friendSearchParam={friend}
+              myPostsSearchParam={myPosts}
             />
           </Suspense>
         </div>

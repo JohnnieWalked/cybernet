@@ -6,6 +6,7 @@ import { postsSliceActions } from '@/store/slices/postsSlice';
 
 /* hooks */
 import { useCallback, useEffect, useMemo, useTransition } from 'react';
+import { useSession } from 'next-auth/react';
 
 /* types */
 import { ModifiedUser, ModifiedPost } from '@/types';
@@ -20,7 +21,7 @@ import PostItem from './PostItem';
 type PostItemProps = {
   friendSearchParam?: string;
   postSearchParam?: string;
-  myPostsSearchParam?: boolean;
+  myPostsSearchParam?: string;
   friends: ModifiedUser[];
 };
 
@@ -28,13 +29,16 @@ export default function PostList({
   friends,
   postSearchParam,
   friendSearchParam,
+  myPostsSearchParam,
 }: PostItemProps) {
+  const session = useSession();
   const dispatch = useAppDispatch();
   const { postsArray, takeDefault, skipDefault, currentSkip, currentTake } =
     useAppSelector((state) => state.postsSlice);
   const [isPending, startTransition] = useTransition();
 
   const handlePostsFetch = useCallback(() => {
+    console.log('not my posts');
     const filteredFriends = friends.filter((user) => {
       if (friendSearchParam) {
         return (
@@ -68,12 +72,35 @@ export default function PostList({
     });
   }, [dispatch, friendSearchParam, friends, skipDefault, takeDefault]);
 
+  const showMyPosts = useCallback(() => {
+    if (!session.data) return <div>User not logged in!</div>;
+    startTransition(() => {
+      dispatch(postsSliceActions.clearPostsArray());
+      actions
+        .getFriendPosts(session.data.user.id, takeDefault, skipDefault)
+        .then((posts) => {
+          if (!posts) return;
+
+          /* convert from Date (non-serialized value) to DateString */
+          const modifiedPosts: ModifiedPost[] = posts.map((post) => {
+            return {
+              ...post,
+              createdAt: post.createdAt.toLocaleDateString(),
+              updatedAt: post.updatedAt.toLocaleDateString(),
+            };
+          });
+
+          dispatch(postsSliceActions.updatePostsArray(modifiedPosts));
+        });
+    });
+  }, [dispatch, session.data, skipDefault, takeDefault]);
+
   /* fetch users' posts */
   useEffect(() => {
     if (postsArray.length !== 0) dispatch(postsSliceActions.clearPostsArray());
 
-    handlePostsFetch();
-  }, [dispatch, handlePostsFetch]);
+    myPostsSearchParam ? showMyPosts() : handlePostsFetch();
+  }, [myPostsSearchParam]);
 
   const renderPosts = () => {
     /* make copy and sort array of posts */

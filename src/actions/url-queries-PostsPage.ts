@@ -21,6 +21,7 @@ export async function urlQueriesPostsPage(
 
   /* if there are no url queries in url from the beggining -> pass searchParamKey and inputValue */
   if (!getLengthOfIterable(searchParamsEntries)) {
+    if (!inputValue) redirect(paths.userPosts(params));
     redirect(paths.userPosts({ [searchParamsKey]: inputValue }));
   }
 
@@ -30,8 +31,8 @@ export async function urlQueriesPostsPage(
       if (key !== searchParamsKey) {
         params[key] = value;
       } else {
-        if (!inputValue) break; // break to avoid passing empty value to url (without it will be for example /?post=somePost&friend=)
-        params[searchParamsKey] = inputValue;
+        if (!inputValue) continue; // continue to avoid passing empty value to url (without it will be for example /?post=somePost&friend=)
+        params[key] = inputValue;
       }
     }
   } else {
