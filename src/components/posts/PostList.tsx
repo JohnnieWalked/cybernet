@@ -3,9 +3,9 @@
 /* RTK */
 import { useAppDispatch, useAppSelector } from '@/hooks/redux-typed-hooks';
 import { postsSliceActions } from '@/store/slices/postsSlice';
-import { friendsSliceActions } from '@/store/slices/friendsSlice';
 
-import { useEffect, useMemo, useTransition } from 'react';
+/* hooks */
+import { useCallback, useEffect, useMemo, useTransition } from 'react';
 
 /* types */
 import { ModifiedUser, ModifiedPost } from '@/types';
@@ -16,7 +16,6 @@ import * as actions from '@/actions';
 /* components */
 import Loader from '../common/Loader';
 import PostItem from './PostItem';
-import { areObjectsEqual } from '@/helpers/equalObjects';
 
 type PostItemProps = {
   friendSearchParam?: string;
@@ -25,69 +24,75 @@ type PostItemProps = {
   friends: ModifiedUser[];
 };
 
-export default function PostList({ friends, postSearchParam }: PostItemProps) {
+export default function PostList({
+  friends,
+  postSearchParam,
+  friendSearchParam,
+}: PostItemProps) {
   const dispatch = useAppDispatch();
   const { postsArray, takeDefault, skipDefault, currentSkip, currentTake } =
     useAppSelector((state) => state.postsSlice);
-  const { friendsArray } = useAppSelector((state) => state.friendsSlice);
   const [isPending, startTransition] = useTransition();
+
+  const handlePostsFetch = useCallback(() => {
+    const filteredFriends = friends.filter((user) => {
+      if (friendSearchParam) {
+        return (
+          user.name.toLocaleLowerCase().includes(friendSearchParam) ||
+          user.username.toLocaleLowerCase().includes(friendSearchParam)
+        );
+      } else {
+        return true;
+      }
+    });
+
+    startTransition(() => {
+      filteredFriends.forEach((user) => {
+        actions
+          .getFriendPosts(user.id, takeDefault, skipDefault)
+          .then((posts) => {
+            if (!posts) return;
+
+            /* convert from Date (non-serialized value) to DateString */
+            const modifiedPosts: ModifiedPost[] = posts.map((post) => {
+              return {
+                ...post,
+                createdAt: post.createdAt.toLocaleDateString(),
+                updatedAt: post.updatedAt.toLocaleDateString(),
+              };
+            });
+
+            dispatch(postsSliceActions.updatePostsArray(modifiedPosts));
+          });
+      });
+    });
+  }, [dispatch, friendSearchParam, friends, skipDefault, takeDefault]);
 
   /* fetch users' posts */
   useEffect(() => {
-    /* if user will search for a specific friend in friend list => it will fetch new request to get posts of filtered friend list */
-    if (
-      friends.length === friendsArray.length &&
-      friends.every((user, index) => areObjectsEqual(user, friendsArray[index]))
-    ) {
-      return;
-    } else {
-      if (friendsArray.length !== 0)
-        dispatch(postsSliceActions.clearPostsArray());
-      dispatch(friendsSliceActions.setFriendsArray(friends));
-      startTransition(() => {
-        friends.forEach((user) => {
-          actions
-            .getFriendPosts(user.id, takeDefault, skipDefault)
-            .then((posts) => {
-              if (!posts) return;
+    if (postsArray.length !== 0) dispatch(postsSliceActions.clearPostsArray());
 
-              /* convert from Date (non-serialized value) to DateString */
-              const modifiedPosts: ModifiedPost[] = posts.map((post) => {
-                return {
-                  ...post,
-                  createdAt: post.createdAt.toLocaleDateString(),
-                  updatedAt: post.updatedAt.toLocaleDateString(),
-                };
-              });
+    handlePostsFetch();
+  }, [dispatch, handlePostsFetch]);
 
-              dispatch(postsSliceActions.updatePostsArray(modifiedPosts));
-            });
-        });
-      });
-    }
-  }, [dispatch, friends, friendsArray, skipDefault, takeDefault]);
-
-  const renderPosts = useMemo(() => {
+  const renderPosts = () => {
     /* make copy and sort array of posts */
     const sortedPostsArrayByDate = postsArray.slice().sort((a, b) => {
       const dateA = a.createdAt.split('.').reverse().join('');
       const dateB = b.createdAt.split('.').reverse().join('');
       return dateB.localeCompare(dateA);
     });
-    if (postSearchParam) {
-      return sortedPostsArrayByDate.map((post, index) => {
+    return sortedPostsArrayByDate.map((post, index) => {
+      const user = friends.find((item) => item.id === post.authorId);
+      if (postSearchParam) {
         if (post.title.toLowerCase().includes(postSearchParam)) {
-          const user = friends.find((item) => item.id === post.authorId);
           return <PostItem user={user} post={post} key={index} />;
         }
-      });
-    } else {
-      return sortedPostsArrayByDate.map((post, index) => {
-        const user = friends.find((item) => item.id === post.authorId);
+      } else {
         return <PostItem user={user} post={post} key={index} />;
-      });
-    }
-  }, [friends, postSearchParam, postsArray]);
+      }
+    });
+  };
 
   return (
     <>
@@ -98,7 +103,7 @@ export default function PostList({ friends, postSearchParam }: PostItemProps) {
           color="var(--redLight)"
         />
       ) : (
-        <div className=" overflow-y-auto pr-3">{renderPosts}</div>
+        <div className=" overflow-y-auto pr-3">{renderPosts()}</div>
       )}
     </>
   );

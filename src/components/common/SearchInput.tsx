@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useSearchParams, usePathname } from 'next/navigation';
 
 import { paths } from '@/routes';
@@ -22,37 +22,26 @@ function SearchInput({ name, label, searchParamsKey }: SearchInputProps) {
   const searchParams = useSearchParams();
   const pathname = usePathname();
 
-  /* func will be triggered after 1000 ms (debounce in 'Input.tsx') automatically */
-  useEffect(() => {
+  const handleUrlQueries = useCallback(() => {
     if (inputValue === undefined) return; // required to save term after reloading page OR directly visiting page
 
-    if (pathname.includes(paths.userFriends())) {
+    if (pathname.includes(paths.userFriends()))
       actions.searchForFriend(inputValue);
-      return;
-    }
 
-    if (pathname.includes(paths.music())) {
-      actions.searchForMusic(inputValue);
-      return;
-    }
+    if (pathname.includes(paths.music())) actions.searchForMusic(inputValue);
 
-    if (pathname.includes(paths.userPosts({}))) {
+    if (pathname.includes(paths.userPosts({})))
       actions.urlQueriesPostsPage(
         searchParams.entries(),
         searchParamsKey,
         inputValue
       );
-      return;
-
-      /* search for 'FRIEND' or 'POST' => if there are neither 'FRIEND' searchParam nor 'POST' searchParam */
-
-      /* search for 'FRIEND' and 'POST' => if there are both 'FRIEND' searchParam and 'POST' searchParam */
-
-      /* if 'FRIEND' url term is included => check if we should find another 'FRIEND' OR find specific friend's post */
-
-      /* if 'POST' url term is included => check if we should find another 'POST' OR find specific friend's post */
-    }
   }, [inputValue]);
+
+  /* func will be triggered after 1000 ms (debounce in 'Input.tsx') automatically */
+  useEffect(() => {
+    handleUrlQueries();
+  }, [handleUrlQueries]);
 
   return (
     <Input

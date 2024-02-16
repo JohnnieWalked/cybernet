@@ -23,7 +23,7 @@ type PostItemProps = {
 
 export default function PostItem({ post, user }: PostItemProps) {
   const session = useSession();
-  const [likeCounter, setLikeCounter] = useState(post.likedBy.length);
+  const [likeCounter, setLikeCounter] = useState(0);
   const [heartStatus, setHeartStatus] = useState<boolean | undefined>();
   const [spamCounter, setSpamCounter] = useState(0);
 
@@ -48,6 +48,8 @@ export default function PostItem({ post, user }: PostItemProps) {
     } else {
       setHeartStatus(false);
     }
+
+    setLikeCounter(post.likedBy.length);
   }, [post.likedBy, session.data]);
 
   const handleClick = () => {
