@@ -22,15 +22,13 @@ export default function InputCheckbox({
   const [isSelected, setIsSelected] = useState<boolean>(false);
 
   // /* debounce */
-  // useEffect(() => {
-  //   const timeoutId = setTimeout(() => {
-  //     if (isSelected) return actions.showMyPosts.bind(null, true)();
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      actions.showMyPosts(isSelected);
+    }, 1200);
 
-  //     actions.showMyPosts.bind(null, false)();
-  //   }, 1200);
-
-  //   () => clearTimeout(timeoutId);
-  // }, [isSelected]);
+    return () => clearTimeout(timeoutId);
+  }, [isSelected]);
 
   return (
     <Checkbox

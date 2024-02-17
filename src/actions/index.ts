@@ -13,3 +13,4 @@ export { urlQueriesPostsPage } from './url-queries-PostsPage';
 export { showMyPosts } from './show-my-posts';
 export { getFriendPosts } from './get-friend-posts';
 export { likePost } from './like-post';
+export { deletePost } from './delete-post';

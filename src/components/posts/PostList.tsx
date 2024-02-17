@@ -38,7 +38,6 @@ export default function PostList({
   const [isPending, startTransition] = useTransition();
 
   const handlePostsFetch = useCallback(() => {
-    console.log('not my posts');
     const filteredFriends = friends.filter((user) => {
       if (friendSearchParam) {
         return (
@@ -100,7 +99,7 @@ export default function PostList({
     if (postsArray.length !== 0) dispatch(postsSliceActions.clearPostsArray());
 
     myPostsSearchParam ? showMyPosts() : handlePostsFetch();
-  }, [myPostsSearchParam]);
+  }, [myPostsSearchParam, friendSearchParam]);
 
   const renderPosts = () => {
     /* make copy and sort array of posts */
@@ -110,13 +109,37 @@ export default function PostList({
       return dateB.localeCompare(dateA);
     });
     return sortedPostsArrayByDate.map((post, index) => {
-      const user = friends.find((item) => item.id === post.authorId);
+      let user: ModifiedUser | undefined;
+      if (myPostsSearchParam) {
+        user = {
+          username: session.data!.user.username,
+          id: session.data!.user.id,
+          name: session.data!.user.name!,
+          image: session.data!.user.image!,
+        };
+      } else {
+        user = friends.find((item) => item.id === post.authorId);
+      }
       if (postSearchParam) {
         if (post.title.toLowerCase().includes(postSearchParam)) {
-          return <PostItem user={user} post={post} key={index} />;
+          return (
+            <PostItem
+              showMyPosts={myPostsSearchParam}
+              user={user}
+              post={post}
+              key={index}
+            />
+          );
         }
       } else {
-        return <PostItem user={user} post={post} key={index} />;
+        return (
+          <PostItem
+            showMyPosts={myPostsSearchParam}
+            user={user}
+            post={post}
+            key={index}
+          />
+        );
       }
     });
   };

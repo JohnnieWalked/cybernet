@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useTransition } from 'react';
 import { useSession } from 'next-auth/react';
 
 /* types */
@@ -15,17 +15,21 @@ import * as actions from '@/actions';
 /* icons */
 import { IoIosHeartEmpty } from 'react-icons/io';
 import { IoHeart } from 'react-icons/io5';
+import { FiDelete } from 'react-icons/fi';
+import Loader from '../common/Loader';
 
 type PostItemProps = {
   post: ModifiedPost;
   user?: ModifiedUser;
+  showMyPosts?: string;
 };
 
-export default function PostItem({ post, user }: PostItemProps) {
+export default function PostItem({ post, user, showMyPosts }: PostItemProps) {
   const session = useSession();
   const [likeCounter, setLikeCounter] = useState(0);
   const [heartStatus, setHeartStatus] = useState<boolean | undefined>();
   const [spamCounter, setSpamCounter] = useState(0);
+  const [isPending, startTransition] = useTransition();
 
   /* debounce like */
   useEffect(() => {
@@ -52,7 +56,7 @@ export default function PostItem({ post, user }: PostItemProps) {
     setLikeCounter(post.likedBy.length);
   }, [post.likedBy, session.data]);
 
-  const handleClick = () => {
+  const handleLike = () => {
     if (spamCounter > 3) return;
     setSpamCounter(spamCounter + 1);
 
@@ -63,6 +67,12 @@ export default function PostItem({ post, user }: PostItemProps) {
       setLikeCounter(likeCounter + 1);
       setHeartStatus(true);
     }
+  };
+
+  const handleDelete = () => {
+    startTransition(() => {
+      if (session.data) actions.deletePost(post.id);
+    });
   };
 
   return (
@@ -77,6 +87,15 @@ export default function PostItem({ post, user }: PostItemProps) {
         <div className="flex items-center text-yellow-400 font-light">
           {user?.name}
         </div>
+        {showMyPosts && (
+          <div className="flex items-center text-xl cursor-pointer transition-all hover:scale-110 hover:text-red-500">
+            {isPending ? (
+              <Loader width="50%" color="var(--redLight)" />
+            ) : (
+              <FiDelete onClick={handleDelete} />
+            )}
+          </div>
+        )}
       </div>
       <div className=" font-bold text-pretty">{post.title}</div>
       <div className=" text-medium text-pretty">{post.content}</div>
@@ -84,14 +103,14 @@ export default function PostItem({ post, user }: PostItemProps) {
         <div className=" flex items-center gap-2 text-gray-500">
           {heartStatus ? (
             <IoHeart
-              onClick={handleClick}
+              onClick={handleLike}
               className={`cursor-pointer transition-all fill-red-600 ${
                 spamCounter > 3 ? 'opacity-30' : ''
               }`}
             />
           ) : (
             <IoIosHeartEmpty
-              onClick={handleClick}
+              onClick={handleLike}
               className={`cursor-pointer transition-all ${
                 spamCounter > 3 ? 'opacity-30' : ''
               }`}
