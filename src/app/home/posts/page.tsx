@@ -20,9 +20,9 @@ import { checkRelationShipStatus } from '@/helpers/checkRelationShipStatus';
 
 interface PostsPageParams {
   searchParams: {
-    friend: string;
-    post: string;
-    myPosts: string;
+    friend?: string;
+    post?: string;
+    myPosts?: string;
   };
 }
 
@@ -72,6 +72,7 @@ export default async function PostsPage({ searchParams }: PostsPageParams) {
         <div className="postList_wrapper flex flex-col w-full h-full text-white rounded-[20px] bg-[rgba(0,_0,_0,_0.3)]">
           <Suspense fallback="Loading...">
             <PostList
+              sessionID={session.user.id}
               friends={friendsStatus.friendsAlready}
               postSearchParam={post}
               friendSearchParam={friend}

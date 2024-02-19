@@ -25,6 +25,7 @@ import Loader from '../common/Loader';
 import PostItem from './PostItem';
 
 type PostItemProps = {
+  sessionID: string;
   friendSearchParam?: string;
   postSearchParam?: string;
   myPostsSearchParam?: boolean;
@@ -32,25 +33,65 @@ type PostItemProps = {
 };
 
 export default function PostList({
+  sessionID,
   friends,
   postSearchParam,
   friendSearchParam,
   myPostsSearchParam,
 }: PostItemProps) {
   const session = useSession();
-
   const dispatch = useAppDispatch();
   const { postsArray } = useAppSelector((state) => state.postsSlice);
   const [isPending, startTransition] = useTransition();
 
-  const fetchAndPassToRTKState = useCallback(
-    (id: string, take: number, skip: number) => {
-      startTransition(() => {
-        console.log('FETCH');
+  const handlePostsFetch = useCallback(() => {
+    const filteredFriends = friends.filter((user) => {
+      if (friendSearchParam) {
+        return (
+          user.name.toLocaleLowerCase().includes(friendSearchParam) ||
+          user.username.toLocaleLowerCase().includes(friendSearchParam)
+        );
+      } else {
+        return true;
+      }
+    });
 
-        dispatch(postsSliceActions.clearPostsArray());
+    startTransition(() => {
+      filteredFriends.forEach((user) => {
+        actions
+          .getFriendPosts(
+            user.id,
+            TAKE_DEFAULT_POSTS_AMOUNT,
+            SKIP_DEFAULT_POSTS_AMOUNT
+          )
+          .then((posts) => {
+            if (!posts) return;
 
-        actions.getFriendPosts(id, take, skip).then((posts) => {
+            /* convert from Date (non-serialized value) to DateString */
+            const modifiedPosts: ModifiedPost[] = posts.map((post) => {
+              return {
+                ...post,
+                createdAt: post.createdAt.toLocaleDateString(),
+                updatedAt: post.updatedAt.toLocaleDateString(),
+              };
+            });
+
+            dispatch(postsSliceActions.updatePostsArray(modifiedPosts));
+          });
+      });
+    });
+  }, [dispatch, friendSearchParam, friends]);
+
+  const showMyPosts = useCallback(() => {
+    startTransition(() => {
+      dispatch(postsSliceActions.clearPostsArray());
+      actions
+        .getFriendPosts(
+          sessionID,
+          TAKE_DEFAULT_POSTS_AMOUNT,
+          SKIP_DEFAULT_POSTS_AMOUNT
+        )
+        .then((posts) => {
           if (!posts) return;
 
           /* convert from Date (non-serialized value) to DateString */
@@ -64,49 +105,14 @@ export default function PostList({
 
           dispatch(postsSliceActions.updatePostsArray(modifiedPosts));
         });
-      });
-    },
-    [dispatch]
-  );
-
-  const handlePostsFetch = useCallback(
-    (take: number, skip: number) => {
-      const filteredFriends = friends.filter((user) => {
-        if (friendSearchParam) {
-          return (
-            user.name.toLocaleLowerCase().includes(friendSearchParam) ||
-            user.username.toLocaleLowerCase().includes(friendSearchParam)
-          );
-        } else {
-          return true;
-        }
-      });
-      dispatch(postsSliceActions.clearPostsArray());
-
-      filteredFriends.forEach((user) => {
-        fetchAndPassToRTKState(user.id, take, skip);
-      });
-    },
-    [dispatch, fetchAndPassToRTKState, friendSearchParam, friends]
-  );
+    });
+  }, [dispatch, sessionID]);
 
   /* fetch users' posts */
   useEffect(() => {
-    if (!session.data) return;
-    myPostsSearchParam
-      ? fetchAndPassToRTKState(
-          session.data.user.id,
-          TAKE_DEFAULT_POSTS_AMOUNT,
-          SKIP_DEFAULT_POSTS_AMOUNT
-        )
-      : handlePostsFetch(TAKE_DEFAULT_POSTS_AMOUNT, SKIP_DEFAULT_POSTS_AMOUNT);
-  }, [
-    myPostsSearchParam,
-    friendSearchParam,
-    session.data,
-    handlePostsFetch,
-    fetchAndPassToRTKState,
-  ]);
+    if (postsArray.length !== 0) dispatch(postsSliceActions.clearPostsArray());
+    myPostsSearchParam ? showMyPosts() : handlePostsFetch();
+  }, [myPostsSearchParam, friendSearchParam]);
 
   const renderPosts = () => {
     /* make copy and sort array of posts */
