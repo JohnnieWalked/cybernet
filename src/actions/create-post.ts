@@ -2,7 +2,10 @@
 
 import { auth } from '@/auth';
 import { db } from '@/db';
+import { paths } from '@/routes';
 import { CreatePostSchema } from '@/schemas';
+import { revalidatePath } from 'next/cache';
+import { NextResponse } from 'next/server';
 
 type CreatePostProps = {
   success?: boolean;

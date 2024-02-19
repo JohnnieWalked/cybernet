@@ -1,8 +1,10 @@
 'use client';
 
+import { toast } from 'react-toastify';
+
 /* hooks */
 import { useFormState } from 'react-dom';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 /* actions */
 import * as actions from '@/actions';
@@ -20,6 +22,13 @@ export default function PostForm() {
   const handleDialogOpen = () => {
     setOpenDialog(true);
   };
+
+  useEffect(() => {
+    if (formState.success) {
+      toast.success('Post successfully created!');
+      setOpenDialog(false);
+    }
+  }, [formState.success]);
 
   const handleDialogClose = () => {
     setOpenDialog(false);
@@ -56,7 +65,6 @@ export default function PostForm() {
           />
 
           <FormButtonPrimary
-            onClick={handleDialogClose}
             type="submit"
             className="post_dialog-btn self-center"
           >

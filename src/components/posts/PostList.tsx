@@ -1,11 +1,17 @@
 'use client';
 
+/* consts */
+import {
+  TAKE_DEFAULT_POSTS_AMOUNT,
+  SKIP_DEFAULT_POSTS_AMOUNT,
+} from '@/constants';
+
 /* RTK */
 import { useAppDispatch, useAppSelector } from '@/hooks/redux-typed-hooks';
 import { postsSliceActions } from '@/store/slices/postsSlice';
 
 /* hooks */
-import { useCallback, useEffect, useMemo, useTransition } from 'react';
+import { useCallback, useEffect, useTransition } from 'react';
 import { useSession } from 'next-auth/react';
 
 /* types */
@@ -21,7 +27,7 @@ import PostItem from './PostItem';
 type PostItemProps = {
   friendSearchParam?: string;
   postSearchParam?: string;
-  myPostsSearchParam?: string;
+  myPostsSearchParam?: boolean;
   friends: ModifiedUser[];
 };
 
@@ -32,52 +38,19 @@ export default function PostList({
   myPostsSearchParam,
 }: PostItemProps) {
   const session = useSession();
+
   const dispatch = useAppDispatch();
-  const { postsArray, takeDefault, skipDefault, currentSkip, currentTake } =
-    useAppSelector((state) => state.postsSlice);
+  const { postsArray } = useAppSelector((state) => state.postsSlice);
   const [isPending, startTransition] = useTransition();
 
-  const handlePostsFetch = useCallback(() => {
-    const filteredFriends = friends.filter((user) => {
-      if (friendSearchParam) {
-        return (
-          user.name.toLocaleLowerCase().includes(friendSearchParam) ||
-          user.username.toLocaleLowerCase().includes(friendSearchParam)
-        );
-      } else {
-        return true;
-      }
-    });
+  const fetchAndPassToRTKState = useCallback(
+    (id: string, take: number, skip: number) => {
+      startTransition(() => {
+        console.log('FETCH');
 
-    startTransition(() => {
-      filteredFriends.forEach((user) => {
-        actions
-          .getFriendPosts(user.id, takeDefault, skipDefault)
-          .then((posts) => {
-            if (!posts) return;
+        dispatch(postsSliceActions.clearPostsArray());
 
-            /* convert from Date (non-serialized value) to DateString */
-            const modifiedPosts: ModifiedPost[] = posts.map((post) => {
-              return {
-                ...post,
-                createdAt: post.createdAt.toLocaleDateString(),
-                updatedAt: post.updatedAt.toLocaleDateString(),
-              };
-            });
-
-            dispatch(postsSliceActions.updatePostsArray(modifiedPosts));
-          });
-      });
-    });
-  }, [dispatch, friendSearchParam, friends, skipDefault, takeDefault]);
-
-  const showMyPosts = useCallback(() => {
-    if (!session.data) return <div>User not logged in!</div>;
-    startTransition(() => {
-      dispatch(postsSliceActions.clearPostsArray());
-      actions
-        .getFriendPosts(session.data.user.id, takeDefault, skipDefault)
-        .then((posts) => {
+        actions.getFriendPosts(id, take, skip).then((posts) => {
           if (!posts) return;
 
           /* convert from Date (non-serialized value) to DateString */
@@ -91,15 +64,49 @@ export default function PostList({
 
           dispatch(postsSliceActions.updatePostsArray(modifiedPosts));
         });
-    });
-  }, [dispatch, session.data, skipDefault, takeDefault]);
+      });
+    },
+    [dispatch]
+  );
+
+  const handlePostsFetch = useCallback(
+    (take: number, skip: number) => {
+      const filteredFriends = friends.filter((user) => {
+        if (friendSearchParam) {
+          return (
+            user.name.toLocaleLowerCase().includes(friendSearchParam) ||
+            user.username.toLocaleLowerCase().includes(friendSearchParam)
+          );
+        } else {
+          return true;
+        }
+      });
+      dispatch(postsSliceActions.clearPostsArray());
+
+      filteredFriends.forEach((user) => {
+        fetchAndPassToRTKState(user.id, take, skip);
+      });
+    },
+    [dispatch, fetchAndPassToRTKState, friendSearchParam, friends]
+  );
 
   /* fetch users' posts */
   useEffect(() => {
-    if (postsArray.length !== 0) dispatch(postsSliceActions.clearPostsArray());
-
-    myPostsSearchParam ? showMyPosts() : handlePostsFetch();
-  }, [myPostsSearchParam, friendSearchParam]);
+    if (!session.data) return;
+    myPostsSearchParam
+      ? fetchAndPassToRTKState(
+          session.data.user.id,
+          TAKE_DEFAULT_POSTS_AMOUNT,
+          SKIP_DEFAULT_POSTS_AMOUNT
+        )
+      : handlePostsFetch(TAKE_DEFAULT_POSTS_AMOUNT, SKIP_DEFAULT_POSTS_AMOUNT);
+  }, [
+    myPostsSearchParam,
+    friendSearchParam,
+    session.data,
+    handlePostsFetch,
+    fetchAndPassToRTKState,
+  ]);
 
   const renderPosts = () => {
     /* make copy and sort array of posts */

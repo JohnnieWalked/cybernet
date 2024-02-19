@@ -19,7 +19,9 @@ export default function InputCheckbox({
   searchParamsKey,
 }: InputCheckboxProps) {
   const searchParams = useSearchParams();
-  const [isSelected, setIsSelected] = useState<boolean>(false);
+  const [isSelected, setIsSelected] = useState<boolean>(
+    searchParams.get(searchParamsKey) ? true : false
+  );
 
   // /* debounce */
   useEffect(() => {
@@ -32,7 +34,7 @@ export default function InputCheckbox({
 
   return (
     <Checkbox
-      defaultChecked={searchParams.get(searchParamsKey) ? true : false}
+      defaultChecked={isSelected}
       className=" self-center"
       defaultSelected
       radius="sm"

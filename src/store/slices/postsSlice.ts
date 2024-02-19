@@ -5,16 +5,12 @@ import type { ModifiedPost } from '@/types';
 
 interface PostsSliceType {
   postsArray: ModifiedPost[];
-  takeDefault: number;
-  skipDefault: number;
   currentTake: number;
   currentSkip: number;
 }
 
 const initialState: PostsSliceType = {
   postsArray: [],
-  takeDefault: 3,
-  skipDefault: 0,
   currentTake: 3,
   currentSkip: 0,
 };
@@ -28,6 +24,11 @@ export const postsSlice = createSlice({
     },
     clearPostsArray: (state) => {
       state.postsArray = [];
+    },
+    deletePostFromArray: (state, action: PayloadAction<string>) => {
+      state.postsArray = state.postsArray.filter(
+        (item) => item.id !== action.payload
+      );
     },
   },
 });

@@ -1,7 +1,10 @@
 'use client';
 
-import { useEffect, useState, useTransition } from 'react';
+import { useEffect, useState } from 'react';
 import { useSession } from 'next-auth/react';
+
+/* RTK */
+import { useAppDispatch } from '@/hooks/redux-typed-hooks';
 
 /* types */
 import type { ModifiedUser, ModifiedPost } from '@/types';
@@ -16,20 +19,20 @@ import * as actions from '@/actions';
 import { IoIosHeartEmpty } from 'react-icons/io';
 import { IoHeart } from 'react-icons/io5';
 import { FiDelete } from 'react-icons/fi';
-import Loader from '../common/Loader';
+import { postsSliceActions } from '@/store/slices/postsSlice';
 
 type PostItemProps = {
   post: ModifiedPost;
   user?: ModifiedUser;
-  showMyPosts?: string;
+  showMyPosts?: boolean;
 };
 
 export default function PostItem({ post, user, showMyPosts }: PostItemProps) {
+  const dispatch = useAppDispatch();
   const session = useSession();
   const [likeCounter, setLikeCounter] = useState(0);
   const [heartStatus, setHeartStatus] = useState<boolean | undefined>();
   const [spamCounter, setSpamCounter] = useState(0);
-  const [isPending, startTransition] = useTransition();
 
   /* debounce like */
   useEffect(() => {
@@ -70,9 +73,8 @@ export default function PostItem({ post, user, showMyPosts }: PostItemProps) {
   };
 
   const handleDelete = () => {
-    startTransition(() => {
-      if (session.data) actions.deletePost(post.id);
-    });
+    dispatch(postsSliceActions.deletePostFromArray(post.id));
+    if (session.data) actions.deletePost(post.id);
   };
 
   return (
@@ -89,11 +91,7 @@ export default function PostItem({ post, user, showMyPosts }: PostItemProps) {
         </div>
         {showMyPosts && (
           <div className="flex items-center text-xl cursor-pointer transition-all hover:scale-110 hover:text-red-500">
-            {isPending ? (
-              <Loader width="50%" color="var(--redLight)" />
-            ) : (
-              <FiDelete onClick={handleDelete} />
-            )}
+            <FiDelete onClick={handleDelete} />
           </div>
         )}
       </div>
