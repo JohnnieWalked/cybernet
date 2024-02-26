@@ -1,4 +1,4 @@
-import type { User, Post } from '@prisma/client';
+import type { User, Post, Comment } from '@prisma/client';
 
 export type ModifiedUser = Omit<User, 'emailVerified' | 'password' | 'email'>;
 export type ModifiedPost = Omit<Post, 'createdAt' | 'updatedAt'> & {
@@ -18,4 +18,8 @@ export type UserPostsURLPaths = {
     | string
     | boolean
     | undefined;
+};
+export type ModifiedComment = Omit<Comment, 'createdAt' | 'updatedAt'> & {
+  createdAt: string;
+  updatedAt: string;
 };

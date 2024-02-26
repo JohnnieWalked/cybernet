@@ -30,6 +30,7 @@ type PostItemProps = {
   postSearchParam?: string;
   myPostsSearchParam?: boolean;
   friends: ModifiedUser[];
+  // posts: (ModifiedPost[] | undefined)[]; /* temporary */
 };
 
 export default function PostList({
@@ -44,23 +45,12 @@ export default function PostList({
   const { postsArray } = useAppSelector((state) => state.postsSlice);
   const [isPending, startTransition] = useTransition();
 
-  const handlePostsFetch = useCallback(() => {
-    const filteredFriends = friends.filter((user) => {
-      if (friendSearchParam) {
-        return (
-          user.name.toLocaleLowerCase().includes(friendSearchParam) ||
-          user.username.toLocaleLowerCase().includes(friendSearchParam)
-        );
-      } else {
-        return true;
-      }
-    });
-
-    startTransition(() => {
-      filteredFriends.forEach((user) => {
+  const fetchPostsByUserID = useCallback(
+    (userID: string) => {
+      startTransition(() => {
         actions
           .getFriendPosts(
-            user.id,
+            userID,
             TAKE_DEFAULT_POSTS_AMOUNT,
             SKIP_DEFAULT_POSTS_AMOUNT
           )
@@ -79,40 +69,38 @@ export default function PostList({
             dispatch(postsSliceActions.updatePostsArray(modifiedPosts));
           });
       });
-    });
-  }, [dispatch, friendSearchParam, friends]);
-
-  const showMyPosts = useCallback(() => {
-    startTransition(() => {
-      dispatch(postsSliceActions.clearPostsArray());
-      actions
-        .getFriendPosts(
-          sessionID,
-          TAKE_DEFAULT_POSTS_AMOUNT,
-          SKIP_DEFAULT_POSTS_AMOUNT
-        )
-        .then((posts) => {
-          if (!posts) return;
-
-          /* convert from Date (non-serialized value) to DateString */
-          const modifiedPosts: ModifiedPost[] = posts.map((post) => {
-            return {
-              ...post,
-              createdAt: post.createdAt.toLocaleDateString(),
-              updatedAt: post.updatedAt.toLocaleDateString(),
-            };
-          });
-
-          dispatch(postsSliceActions.updatePostsArray(modifiedPosts));
-        });
-    });
-  }, [dispatch, sessionID]);
+    },
+    [dispatch]
+  );
 
   /* fetch users' posts */
   useEffect(() => {
-    if (postsArray.length !== 0) dispatch(postsSliceActions.clearPostsArray());
-    myPostsSearchParam ? showMyPosts() : handlePostsFetch();
-  }, [myPostsSearchParam, friendSearchParam]);
+    dispatch(postsSliceActions.clearPostsArray());
+    startTransition(() => {
+      console.log('EFFECT');
+      if (myPostsSearchParam) {
+        fetchPostsByUserID(sessionID);
+      } else {
+        if (friendSearchParam) {
+          friends.forEach((user) => {
+            if (
+              user.name.toLocaleLowerCase().includes(friendSearchParam) ||
+              user.username.toLocaleLowerCase().includes(friendSearchParam)
+            ) {
+              fetchPostsByUserID(user.id);
+            }
+          });
+        } else {
+          friends.forEach((user) => fetchPostsByUserID(user.id));
+          /* temp; rendering post list SSR */
+          // posts.forEach((posts) => {
+          //   if (!posts) return;
+          //   dispatch(postsSliceActions.updatePostsArray(posts));
+          // });
+        }
+      }
+    });
+  }, [myPostsSearchParam, friendSearchParam, fetchPostsByUserID, dispatch]);
 
   const renderPosts = () => {
     /* make copy and sort array of posts */
@@ -134,7 +122,7 @@ export default function PostList({
         user = friends.find((item) => item.id === post.authorId);
       }
       if (postSearchParam) {
-        if (post.title.toLowerCase().includes(postSearchParam)) {
+        if (post.title.toLocaleLowerCase().includes(postSearchParam)) {
           return (
             <PostItem
               showMyPosts={myPostsSearchParam}

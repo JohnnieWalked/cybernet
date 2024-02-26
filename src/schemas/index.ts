@@ -30,3 +30,7 @@ export const CreatePostSchema = z.object({
     .max(15, { message: 'Maximum 15 characters.' }),
   content: z.string().min(1, { message: 'This field has to be filled.' }),
 });
+
+export const CreateCommentSchema = z.object({
+  content: z.string().min(1, { message: 'This field has to be filled.' }),
+});

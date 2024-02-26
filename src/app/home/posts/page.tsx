@@ -1,3 +1,9 @@
+/* consts */
+import {
+  SKIP_DEFAULT_POSTS_AMOUNT,
+  TAKE_DEFAULT_POSTS_AMOUNT,
+} from '@/constants';
+
 import { Suspense } from 'react';
 
 /* auth */
@@ -14,9 +20,13 @@ import InputCheckbox from '@/components/common/InputCheckbox';
 
 /* data */
 import { getUserFriendsAndRelationsById } from '@/data/cached/get-friends-&-relations-by-id';
+// import { getFriendPostsByID } from '@/data/cached/get-friend-posts-by-id';
 
 /* helpers */
 import { checkRelationShipStatus } from '@/helpers/checkRelationShipStatus';
+
+/* types */
+// import { ModifiedPost } from '@/types';
 
 interface PostsPageParams {
   searchParams: {
@@ -38,6 +48,43 @@ export default async function PostsPage({ searchParams }: PostsPageParams) {
   const { friends, friendsAddedMe } = user;
   const friendsStatus = checkRelationShipStatus(friends, friendsAddedMe);
 
+  /* temp; SSR post list */
+  // const friendsPostsArray = await Promise.all(
+  //   friendsStatus.friendsAlready.map(async (user) => {
+  //     let posts;
+  //     if (
+  //       friend &&
+  //       (user.name.toLocaleLowerCase().includes(friend) ||
+  //         user.username.toLocaleLowerCase().includes(friend))
+  //     ) {
+  //       posts = await getFriendPostsByID(
+  //         user.id,
+  //         TAKE_DEFAULT_POSTS_AMOUNT,
+  //         SKIP_DEFAULT_POSTS_AMOUNT
+  //       );
+  //     } else {
+  //       posts = await getFriendPostsByID(
+  //         user.id,
+  //         TAKE_DEFAULT_POSTS_AMOUNT,
+  //         SKIP_DEFAULT_POSTS_AMOUNT
+  //       );
+  //     }
+
+  //     if (!posts) return;
+
+  //     /* convert from Date (non-serialized value) to DateString */
+  //     const modifiedPosts: ModifiedPost[] = posts.map((post) => {
+  //       return {
+  //         ...post,
+  //         createdAt: post.createdAt.toLocaleDateString(),
+  //         updatedAt: post.updatedAt.toLocaleDateString(),
+  //       };
+  //     });
+
+  //     return modifiedPosts;
+  //   })
+  // );
+
   return (
     <section className="flex flex-col w-full h-full justify-center items-center gap-10">
       <Title>Posts</Title>
@@ -47,7 +94,7 @@ export default async function PostsPage({ searchParams }: PostsPageParams) {
         searchParamsKey="post"
       />
 
-      <div className="relarive grid grid-cols-[minmax(200px,_300px),_1fr,_minmax(200px,_300px)] grid-rows-[minmax(400px,_600px)] w-full h-full px-10 gap-12">
+      <div className="relative grid grid-cols-[minmax(200px,_300px),_1fr,_minmax(200px,_300px)] grid-rows-[minmax(400px,_600px)] w-full h-full px-10 gap-12">
         <div className="postsFriendList flex flex-col h-full w-full gap-3 text-cyan-400 rounded-[20px] bg-[rgba(0,_0,_0,_0.3)]">
           <span className=" text-[var(--yellow)] text-center text-xl z-10 font-bold tracking-wider">
             Friend List
@@ -77,6 +124,7 @@ export default async function PostsPage({ searchParams }: PostsPageParams) {
               postSearchParam={post}
               friendSearchParam={friend}
               myPostsSearchParam={!!myPosts}
+              // posts={friendsPostsArray}
             />
           </Suspense>
         </div>

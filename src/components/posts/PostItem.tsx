@@ -11,6 +11,8 @@ import type { ModifiedUser, ModifiedPost } from '@/types';
 
 /* components */
 import UserAvatar from '../user/UserAvatar';
+import CommentList from '../comments/CommentList';
+import CommentForm from '../comments/CommentForm';
 
 /* actions */
 import * as actions from '@/actions';
@@ -33,6 +35,8 @@ export default function PostItem({ post, user, showMyPosts }: PostItemProps) {
   const [likeCounter, setLikeCounter] = useState(0);
   const [heartStatus, setHeartStatus] = useState<boolean | undefined>();
   const [spamCounter, setSpamCounter] = useState(0);
+  const [showComments, setShowComments] = useState(false);
+  const [leaveComment, setLeaveComment] = useState(false);
 
   /* debounce like */
   useEffect(() => {
@@ -77,6 +81,14 @@ export default function PostItem({ post, user, showMyPosts }: PostItemProps) {
     if (session.data) actions.deletePost(post.id);
   };
 
+  const handleShowComments = () => {
+    setShowComments(!showComments);
+  };
+
+  const handleLeaveComment = () => {
+    setLeaveComment(!leaveComment);
+  };
+
   return (
     <div className="flex flex-col gap-3 mb-4">
       <div className="flex gap-3">
@@ -118,6 +130,25 @@ export default function PostItem({ post, user, showMyPosts }: PostItemProps) {
           <span className="font-bold text-xs">{likeCounter} likes</span>
         </div>
         <div className=" font-bold text-xs text-gray-500">{post.createdAt}</div>
+      </div>
+      <div className=" flex flex-col gap-7 items-center justify-center w-full ">
+        <div className="flex gap-10">
+          <span
+            onClick={handleShowComments}
+            className="text-sm w-max text-gray-500 cursor-pointer hover:underline underline-offset-4 hover:text-cyan-400 transition-all text-center"
+          >
+            {showComments ? 'Hide comments' : 'Show comments'}
+          </span>
+
+          <span
+            onClick={handleLeaveComment}
+            className="text-sm w-max text-gray-500 cursor-pointer hover:underline underline-offset-4 hover:text-cyan-400 transition-all text-center"
+          >
+            Leave a comment
+          </span>
+        </div>
+        {leaveComment && <CommentForm postID={post.id} />}
+        {showComments && <CommentList postID={post.id} />}
       </div>
     </div>
   );

@@ -14,3 +14,5 @@ export { showMyPosts } from './show-my-posts';
 export { getFriendPosts } from './get-friend-posts';
 export { likePost } from './like-post';
 export { deletePost } from './delete-post';
+export { createComment } from './create-comment';
+export { getComments } from './get-comments';

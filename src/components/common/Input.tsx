@@ -18,7 +18,7 @@ export default function Input(props: InputProps) {
 
   const handleInputChange = (value: string) => {
     if (!inputRef.current) return;
-    setInputValue(value);
+    setInputValue(value.toLocaleLowerCase());
   };
 
   /* debounce */
